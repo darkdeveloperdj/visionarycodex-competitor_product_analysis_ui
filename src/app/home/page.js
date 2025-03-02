@@ -39,7 +39,7 @@ const HomePage = () => {
           </p>
         )}
         <div className="mt-6 flex justify-center">
-          <Link href={`/search?query=${query}`}>
+          <Link href={`/competitor-selection?query=${query}`}>
             <button className="px-6 py-3 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-300">
               Search
             </button>

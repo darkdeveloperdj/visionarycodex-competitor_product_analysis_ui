@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const Header = () => {
   return (
@@ -7,16 +8,17 @@ const Header = () => {
       <div className="container mx-auto flex justify-between items-center px-6">
         {/* Logo Section */}
         <div className="flex items-center">
-          <img
-            src="https://via.placeholder.com/50"
-            alt="Logo"
-            className="w-12 h-12 mr-3 rounded-full border-2 border-white"
-          />
           <Link
             href="/"
             className="text-2xl font-semibold text-gray-200 hover:text-white transition duration-300"
           >
-            MyLogo
+            <Image
+              src="/assets/images/logo-min.png"
+              alt="Logo"
+              width={300}
+              height={200}
+              className="w-16 h-16 mr-8 rounded-full border-2 border-white"
+            />
           </Link>
         </div>
 
