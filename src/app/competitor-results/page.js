@@ -176,33 +176,35 @@ const SearchPage = () => {
                   {brand === "MyCompany" ? "🚀 " : "🏷️ "}
                   {brand}
                 </h4>
-                {groupedProducts[brand]?.map((product) => (
-                  <label
-                    key={product.model}
-                    className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
-                      selectedProducts.some((p) => p.model === product.model)
-                        ? "bg-indigo-600/80 text-white shadow-md scale-[1.02]"
-                        : "hover:bg-white/10 text-gray-300 hover:scale-[1.01]"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      className="form-checkbox h-4 w-4 text-purple-400 transition duration-150 ease-in-out"
-                      checked={selectedProducts.some(
-                        (p) => p.model === product.model
-                      )}
-                      onChange={() => toggleProductSelection(product)}
-                    />
-                    <span className="ml-3 text-sm">
-                      {product.model}
-                      {product.brand === "MyCompany" && (
-                        <span className="ml-2 text-xs text-yellow-300">
-                          (✨ Yours)
-                        </span>
-                      )}
-                    </span>
-                  </label>
-                ))}
+                <div className="space-y-2">
+                  {groupedProducts[brand]?.map((product) => (
+                    <label
+                      key={product.model}
+                      className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
+                        selectedProducts.some((p) => p.model === product.model)
+                          ? "bg-indigo-600/80 text-white shadow-md scale-[1.02]"
+                          : "hover:bg-white/10 text-gray-300 hover:scale-[1.01]"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="form-checkbox h-4 w-4 text-purple-400 transition duration-150 ease-in-out"
+                        checked={selectedProducts.some(
+                          (p) => p.model === product.model
+                        )}
+                        onChange={() => toggleProductSelection(product)}
+                      />
+                      <span className="ml-3 text-sm">
+                        {product.model}
+                        {product.brand === "MyCompany" && (
+                          <span className="ml-2 text-xs text-yellow-300">
+                            (✨ Yours)
+                          </span>
+                        )}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -211,24 +213,26 @@ const SearchPage = () => {
             <h3 className="font-semibold mb-4 text-lg text-purple-200">
               🛠️ Feature Selection
             </h3>
-            {allFeatures.map((feature) => (
-              <label
-                key={feature}
-                className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
-                  selectedFeatures.includes(feature)
-                    ? "bg-purple-600/80 text-white shadow-md scale-[1.02]"
-                    : "hover:bg-white/10 text-gray-300 hover:scale-[1.01]"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  className="form-checkbox h-4 w-4 text-purple-400 transition duration-150 ease-in-out"
-                  checked={selectedFeatures.includes(feature)}
-                  onChange={() => toggleFeatureSelection(feature)}
-                />
-                <span className="ml-3 text-sm capitalize">{feature}</span>
-              </label>
-            ))}
+            <div className="space-y-2">
+              {allFeatures.map((feature) => (
+                <label
+                  key={feature}
+                  className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
+                    selectedFeatures.includes(feature)
+                      ? "bg-purple-600/80 text-white shadow-md scale-[1.02]"
+                      : "hover:bg-white/10 text-gray-300 hover:scale-[1.01]"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-4 w-4 text-purple-400 transition duration-150 ease-in-out"
+                    checked={selectedFeatures.includes(feature)}
+                    onChange={() => toggleFeatureSelection(feature)}
+                  />
+                  <span className="ml-3 text-sm capitalize">{feature}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 
