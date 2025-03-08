@@ -361,9 +361,7 @@ const SearchPage = () => {
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-400">
-                        🛒 Market Demand
-                      </span>
+                      <span className="text-sm text-gray-400">🛒 Demand</span>
                       <span className="text-sm font-medium text-indigo-300">
                         {product.insights.demand === "High" ? "🔥 " : "🌱 "}
                         {product.insights.demand}
