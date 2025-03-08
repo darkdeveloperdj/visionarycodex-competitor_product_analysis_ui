@@ -38,6 +38,46 @@ export const productData = [
     ],
   },
   {
+    brand: "Apple",
+    model: "iPhone 13 Pro",
+    category: "electronics",
+    features: { "5G": true, "ProMotion Display": true, "Face ID": true },
+    insights: {
+      popularity: "Very High",
+      priceTrend: "Stable",
+      demand: "Extreme",
+      marketShare: "35%",
+    },
+    reviews: [
+      {
+        user: "TechFan",
+        rating: 4.8,
+        comment: "Industry-leading performance",
+        date: "2024-03-01",
+      },
+    ],
+  },
+  {
+    brand: "Apple",
+    model: "iPhone 14 Pro",
+    category: "electronics",
+    features: { "5G": true, "ProMotion Display": true, "Face ID": true },
+    insights: {
+      popularity: "Very High",
+      priceTrend: "Stable",
+      demand: "Extreme",
+      marketShare: "35%",
+    },
+    reviews: [
+      {
+        user: "TechFan",
+        rating: 4.8,
+        comment: "Industry-leading performance",
+        date: "2024-03-01",
+      },
+    ],
+  },
+  {
     brand: "Samsung",
     model: "Galaxy Z Fold 5",
     category: "electronics",

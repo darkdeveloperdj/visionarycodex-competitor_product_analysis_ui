@@ -31,9 +31,9 @@ const StarRating = ({ rating }) => {
       {[...Array(5)].map((_, index) => (
         <span key={index} className="text-xl">
           {index < fullStars ? (
-            "★"
+            "⭐"
           ) : index === fullStars && hasHalfStar ? (
-            "½"
+            "🌟½"
           ) : (
             <span className="text-gray-400">☆</span>
           )}
@@ -56,6 +56,11 @@ const SearchPage = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [selectedFeatures, setSelectedFeatures] = useState([]);
   const [deselectedMyCompany, setDeselectedMyCompany] = useState(new Set());
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const filteredProducts = useMemo(
     () => allProducts.filter((product) => product.category === category),
@@ -150,20 +155,25 @@ const SearchPage = () => {
         }
       `}</style>
 
-      <div className="flex gap-8">
+      <div
+        className={`flex gap-8 transform transition-all duration-1000 ${
+          mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+        }`}
+      >
         {/* Sidebar Filters */}
-        <div className="w-80 p-6 bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10">
+        <div className="w-80 p-6 bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 animate-fadeInLeft">
           <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-purple-400 to-indigo-300 bg-clip-text text-transparent">
-            Comparison Filters
+            🔍 Comparison Filters
           </h2>
 
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-purple-200">
-              Select Products
+              📦 Select Products
             </h3>
             {brandList.map((brand) => (
               <div key={brand} className="mb-4">
                 <h4 className="text-md font-bold mb-2 text-indigo-200">
+                  {brand === "MyCompany" ? "🚀 " : "🏷️ "}
                   {brand}
                 </h4>
                 {groupedProducts[brand]?.map((product) => (
@@ -171,8 +181,8 @@ const SearchPage = () => {
                     key={product.model}
                     className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
                       selectedProducts.some((p) => p.model === product.model)
-                        ? "bg-indigo-600/80 text-white shadow-md"
-                        : "hover:bg-white/10 text-gray-300"
+                        ? "bg-indigo-600/80 text-white shadow-md scale-[1.02]"
+                        : "hover:bg-white/10 text-gray-300 hover:scale-[1.01]"
                     }`}
                   >
                     <input
@@ -187,7 +197,7 @@ const SearchPage = () => {
                       {product.model}
                       {product.brand === "MyCompany" && (
                         <span className="ml-2 text-xs text-yellow-300">
-                          (Yours)
+                          (✨ Yours)
                         </span>
                       )}
                     </span>
@@ -199,15 +209,15 @@ const SearchPage = () => {
 
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-purple-200">
-              Feature Selection
+              🛠️ Feature Selection
             </h3>
             {allFeatures.map((feature) => (
               <label
                 key={feature}
                 className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
                   selectedFeatures.includes(feature)
-                    ? "bg-purple-600/80 text-white shadow-md"
-                    : "hover:bg-white/10 text-gray-300"
+                    ? "bg-purple-600/80 text-white shadow-md scale-[1.02]"
+                    : "hover:bg-white/10 text-gray-300 hover:scale-[1.01]"
                 }`}
               >
                 <input
@@ -224,24 +234,27 @@ const SearchPage = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-8 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10">
-          <h2 className="text-4xl font-extrabold text-center mb-8 bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
-            {query} Competitive Analysis
+          <h2 className="text-4xl font-extrabold text-center mb-8 bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text animate-float">
+            <span className="inline-block mr-2">📊</span>
+            <span className="bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text  text-transparent animate-float">
+              {query} Competitive Analysis
+            </span>
           </h2>
 
           {/* Product Comparison Table */}
-          <div className="mb-12">
+          <div className="mb-12 animate-fadeInUp delay-100">
             <h3 className="text-2xl font-bold mb-6 text-purple-200">
-              Feature Comparison Matrix
+              📜 Feature Comparison Matrix
             </h3>
             <div className="overflow-x-auto rounded-2xl border border-white/10 shadow-xl">
               <table className="w-full">
                 <thead className="bg-indigo-600/50">
                   <tr>
                     <th className="p-4 text-left font-semibold text-purple-100 rounded-tl-2xl">
-                      Brand
+                      🏭 Brand
                     </th>
                     <th className="p-4 text-left font-semibold text-purple-100">
-                      Model
+                      📛 Model
                     </th>
                     {selectedFeatures.map((feature) => (
                       <th
@@ -259,14 +272,14 @@ const SearchPage = () => {
                       key={index}
                       className={`${
                         index % 2 === 0 ? "bg-white/5" : "bg-white/10"
-                      } last:rounded-b-2xl`}
+                      } last:rounded-b-2xl transition-all duration-200 hover:bg-white/15`}
                     >
                       <td className="p-4 text-sm font-medium">
                         <span className="flex items-center">
                           {product.brand}
                           {product.brand === "MyCompany" && (
                             <span className="ml-2 px-2 py-1 text-xs bg-purple-600/30 text-purple-300 rounded-full">
-                              Your Product
+                              🎯 Your Product
                             </span>
                           )}
                         </span>
@@ -277,9 +290,9 @@ const SearchPage = () => {
                       {selectedFeatures.map((feature) => (
                         <td key={feature} className="p-4 text-center text-2xl">
                           {product.features[feature] ? (
-                            <span className="text-green-400">✓</span>
+                            <span className="text-green-400">✅</span>
                           ) : (
-                            <span className="text-red-400">✕</span>
+                            <span className="text-red-400">❌</span>
                           )}
                         </td>
                       ))}
@@ -291,15 +304,15 @@ const SearchPage = () => {
           </div>
 
           {/* Product Insights */}
-          <div className="mb-12">
+          <div className="mb-12 animate-fadeInUp delay-200">
             <h3 className="text-2xl font-bold mb-6 text-purple-200">
-              Market Insights
+              💡 Market Insights
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {selectedProducts.map((product) => (
                 <div
                   key={product.model}
-                  className="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-purple-400/30 transition-all duration-300"
+                  className="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-purple-400/30 transition-all duration-300 hover:scale-[1.02]"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-lg font-semibold text-purple-200">
@@ -311,7 +324,9 @@ const SearchPage = () => {
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-400">Popularity</span>
+                      <span className="text-sm text-gray-400">
+                        🚀 Popularity
+                      </span>
                       <span
                         className={`text-sm font-medium ${
                           product.insights.popularity === "High"
@@ -319,11 +334,15 @@ const SearchPage = () => {
                             : "text-red-400"
                         }`}
                       >
-                        {product.insights.popularity}
+                        {product.insights.popularity === "High"
+                          ? "📈 High"
+                          : "📉 Low"}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-400">Price Trend</span>
+                      <span className="text-sm text-gray-400">
+                        💰 Price Trend
+                      </span>
                       <span
                         className={`text-sm font-medium ${
                           product.insights.priceTrend === "Increasing"
@@ -331,20 +350,24 @@ const SearchPage = () => {
                             : "text-green-400"
                         }`}
                       >
+                        {product.insights.priceTrend === "Increasing"
+                          ? "📈"
+                          : "📉"}{" "}
                         {product.insights.priceTrend}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-400">
-                        Market Demand
+                        🛒 Market Demand
                       </span>
                       <span className="text-sm font-medium text-indigo-300">
+                        {product.insights.demand === "High" ? "🔥 " : "🌱 "}
                         {product.insights.demand}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-400">
-                        Market Share
+                        🏆 Market Share
                       </span>
                       <span className="text-sm font-medium text-purple-300">
                         {product.insights.marketShare}
@@ -357,9 +380,9 @@ const SearchPage = () => {
           </div>
 
           {/* Competitive Positioning */}
-          <div className="mb-12">
+          <div className="mb-12 animate-fadeInUp delay-300">
             <h3 className="text-2xl font-bold mb-6 text-purple-200">
-              Competitive Positioning
+              ⚔️ Competitive Positioning
             </h3>
             <div className="grid grid-cols-1 gap-6">
               {selectedProducts
@@ -370,7 +393,7 @@ const SearchPage = () => {
                     className="bg-gradient-to-br from-purple-600/30 to-indigo-600/30 p-6 rounded-2xl border border-white/10"
                   >
                     <h4 className="text-xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-indigo-200">
-                      Competitive Analysis: {myProduct.model}
+                      🥊 Competitive Analysis: {myProduct.model}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {selectedProducts
@@ -378,14 +401,14 @@ const SearchPage = () => {
                         .map((competitor) => (
                           <div
                             key={competitor.model}
-                            className="bg-white/5 p-4 rounded-xl border border-white/10"
+                            className="bg-white/5 p-4 rounded-xl border border-white/10 hover:scale-[1.01] transition-all duration-200"
                           >
                             <div className="flex items-center justify-between mb-4">
                               <div className="flex items-center space-x-3">
                                 <span className="font-medium text-purple-200">
                                   {myProduct.model}
                                 </span>
-                                <span className="text-gray-400">vs</span>
+                                <span className="text-gray-400">⚔️ vs ⚔️</span>
                                 <span className="font-medium text-indigo-200">
                                   {competitor.model}
                                 </span>
@@ -406,7 +429,7 @@ const SearchPage = () => {
                                       : "text-red-400"
                                   }`}
                                 >
-                                  {myProduct.features[feature] ? "✓" : "✕"}
+                                  {myProduct.features[feature] ? "✅" : "❌"}
                                 </span>
                                 <span className="text-xs text-gray-400 px-2">
                                   {feature}
@@ -418,7 +441,7 @@ const SearchPage = () => {
                                       : "text-red-400"
                                   }`}
                                 >
-                                  {competitor.features[feature] ? "✓" : "✕"}
+                                  {competitor.features[feature] ? "✅" : "❌"}
                                 </span>
                               </div>
                             ))}
@@ -431,11 +454,11 @@ const SearchPage = () => {
           </div>
 
           {/* Trend Analysis */}
-          <div className="mb-12">
+          <div className="mb-12 animate-fadeInUp delay-400">
             <h3 className="text-2xl font-bold mb-6 text-purple-200">
-              Market Trends
+              📈 Market Trends
             </h3>
-            <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 hover:scale-[1.005] transition-all duration-300">
               <Bar
                 data={trendData}
                 options={{
@@ -461,9 +484,9 @@ const SearchPage = () => {
           </div>
 
           {/* Customer Reviews & Ratings */}
-          <div className="mb-12">
+          <div className="mb-12 animate-fadeInUp delay-500">
             <h3 className="text-2xl font-bold mb-6 text-purple-200">
-              Customer Feedback Analysis
+              😊 Customer Feedback Analysis
             </h3>
             <div className="space-y-6">
               {selectedProducts.map((product) => {
@@ -476,11 +499,11 @@ const SearchPage = () => {
                 return (
                   <div
                     key={product.model}
-                    className="bg-white/5 p-6 rounded-2xl border border-white/10"
+                    className="bg-white/5 p-6 rounded-2xl border border-white/10 hover:scale-[1.005] transition-all duration-300"
                   >
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                       <h4 className="text-lg font-semibold text-purple-200 mb-2 md:mb-0">
-                        {product.model} Reviews
+                        💬 {product.model} Reviews
                       </h4>
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center">
@@ -490,7 +513,7 @@ const SearchPage = () => {
                           </span>
                         </div>
                         <span className="text-sm text-gray-400">
-                          {product.reviews.length} reviews
+                          📝 {product.reviews.length} reviews
                         </span>
                       </div>
                     </div>
@@ -503,9 +526,10 @@ const SearchPage = () => {
                           <div className="flex justify-between items-start mb-2">
                             <div>
                               <h5 className="font-medium text-gray-200">
-                                {review.user}
+                                👤 {review.user}
                               </h5>
                               <p className="text-xs text-gray-400">
+                                📅{" "}
                                 {new Date(review.date).toLocaleDateString(
                                   "en-US",
                                   {
@@ -516,10 +540,19 @@ const SearchPage = () => {
                                 )}
                               </p>
                             </div>
-                            <StarRating rating={review.rating} />
+                            <div className="flex items-center space-x-2">
+                              <StarRating rating={review.rating} />
+                              {review.rating >= 4 ? (
+                                <span className="text-2xl">😍</span>
+                              ) : review.rating >= 3 ? (
+                                <span className="text-2xl">😊</span>
+                              ) : (
+                                <span className="text-2xl">😞</span>
+                              )}
+                            </div>
                           </div>
                           <p className="text-sm text-gray-300 leading-relaxed">
-                            {review.comment}
+                            💭 {review.comment}
                           </p>
                         </div>
                       ))}
