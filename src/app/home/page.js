@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { category } from "../demo_data";
 
 const categoryLabels = {
@@ -12,8 +13,23 @@ const categoryLabels = {
 };
 
 const HomePage = () => {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(category[0]);
+  const [showError, setShowError] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!query.trim()) {
+      setShowError(true);
+      return;
+    }
+    router.push(
+      `/competitor-selection?query=${encodeURIComponent(
+        query
+      )}&category=${selectedCategory}`
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4 font-sans">
@@ -33,7 +49,7 @@ const HomePage = () => {
           industries
         </p>
 
-        <div className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* Category Selector */}
           <div>
             <label className="block text-purple-200 text-sm font-medium mb-3">
@@ -44,6 +60,7 @@ const HomePage = () => {
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full p-4 pl-6 pr-10 text-gray-100 bg-white/5 border border-white/10 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none transition-all duration-200 hover:border-purple-400/30"
+                required
               >
                 {category.map((cat) => (
                   <option
@@ -83,8 +100,12 @@ const HomePage = () => {
                 type="text"
                 placeholder="Enter product name or keyword..."
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setShowError(false);
+                }}
                 className="w-full p-4 pl-12 pr-6 text-gray-100 bg-white/5 border border-white/10 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 hover:border-purple-400/30"
+                required
               />
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
                 <svg
@@ -102,6 +123,11 @@ const HomePage = () => {
                 </svg>
               </div>
             </div>
+            {showError && (
+              <p className="text-red-400 text-sm mt-2 ml-2">
+                Please enter a product name or keyword
+              </p>
+            )}
           </div>
 
           {/* Search Preview */}
@@ -120,17 +146,15 @@ const HomePage = () => {
 
           {/* CTA Button */}
           <div className="mt-8">
-            <Link
-              href={`/competitor-selection?query=${query}&category=${selectedCategory}`}
-              className="block w-full transform transition-transform duration-200 hover:scale-[1.02]"
+            <button
+              type="submit"
+              className="w-full px-8 py-4 text-lg font-semibold text-gray-100 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl shadow-2xl hover:shadow-purple-500/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900"
             >
-              <button className="w-full px-8 py-4 text-lg font-semibold text-gray-100 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl shadow-2xl hover:shadow-purple-500/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-                Generate Competitive Analysis
-                <span className="ml-3 text-purple-200">→</span>
-              </button>
-            </Link>
+              Search and Select Competitor
+              <span className="ml-3 text-purple-200">→</span>
+            </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

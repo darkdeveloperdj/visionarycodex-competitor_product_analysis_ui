@@ -130,6 +130,30 @@ export const productData = [
       },
     ],
   },
+  {
+    brand: "L'Oréal",
+    model: "Revitalift Serum 2",
+    category: "beauty",
+    features: {
+      "Hyaluronic Acid": true,
+      "Anti-Aging": true,
+      "Dermatologist Tested": true,
+    },
+    insights: {
+      popularity: "High",
+      priceTrend: "Stable",
+      demand: "High",
+      marketShare: "20%",
+    },
+    reviews: [
+      {
+        user: "BeautyBlogger",
+        rating: 4.6,
+        comment: "Visible results",
+        date: "2024-02-28",
+      },
+    ],
+  },
   // ... 19 more beauty items
 
   // Sports (20)
