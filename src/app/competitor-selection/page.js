@@ -8,9 +8,14 @@ const CompetitorSelection = () => {
   const query = searchParams.get("query") || "Products";
   const category = searchParams.get("category") || "general";
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
   const [selectedCompetitors, setSelectedCompetitors] = useState([]);
   const competitors = categoryCompetitors[category.toLowerCase()] || [];
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleCompetitor = (competitor) => {
     setSelectedCompetitors((prev) =>
@@ -35,17 +40,41 @@ const CompetitorSelection = () => {
         body {
           font-family: "Inter", sans-serif;
         }
+
+        @keyframes float {
+          0% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+          100% {
+            transform: translateY(0px);
+          }
+        }
+
+        .animate-float {
+          animation: float 4s ease-in-out infinite;
+        }
       `}</style>
 
-      <div className="w-full max-w-2xl p-8 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10">
-        <h1 className="text-4xl font-extrabold text-center mb-6 bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
+      <div
+        className={`w-full max-w-2xl p-8 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10
+        transform transition-all duration-1000 ${
+          mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+        }`}
+      >
+        <h1 className="text-4xl font-extrabold text-center mb-6 bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent animate-float">
           Competitor Selection
         </h1>
 
         <div className="text-center mb-8">
           <p className="text-lg text-purple-200">
             Analyzing:{" "}
-            <span className="font-semibold text-purple-300">{query}</span> in{" "}
+            <span className="font-semibold text-purple-300 animate-pulse">
+              {query}
+            </span>{" "}
+            in{" "}
             <span className="font-semibold text-indigo-300">
               {category.charAt(0).toUpperCase() + category.slice(1)}
             </span>
@@ -54,18 +83,20 @@ const CompetitorSelection = () => {
 
         {competitors.length > 0 ? (
           <div className="space-y-4 mb-8">
-            <h2 className="text-xl font-semibold text-purple-200 mb-4 text-center">
+            <h2 className="text-xl font-semibold text-purple-200 mb-4 text-center animate-fadeInUp">
               Select Competitors ({selectedCompetitors.length} chosen)
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {competitors.map((competitor) => (
+              {competitors.map((competitor, index) => (
                 <label
                   key={competitor}
-                  className={`flex items-center p-4 rounded-xl border transition-all duration-200 cursor-pointer ${
-                    selectedCompetitors.includes(competitor)
-                      ? "border-purple-500 bg-purple-900/30 shadow-purple-500/20"
-                      : "border-white/10 hover:border-purple-400/30 bg-white/5"
-                  }`}
+                  className={`flex items-center p-4 rounded-xl border transition-all duration-200 cursor-pointer 
+                    animate-fadeInUp hover:scale-[1.02] ${
+                      selectedCompetitors.includes(competitor)
+                        ? "border-purple-500 bg-purple-900/30 shadow-purple-500/20"
+                        : "border-white/10 hover:border-purple-400/30 bg-white/5"
+                    }`}
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <input
                     type="checkbox"
@@ -75,16 +106,16 @@ const CompetitorSelection = () => {
                   />
                   <div className="flex items-center">
                     <div
-                      className={`w-6 h-6 flex items-center justify-center mr-4 border-2 rounded-md transition-colors
-                      ${
-                        selectedCompetitors.includes(competitor)
-                          ? "bg-purple-500 border-purple-500"
-                          : "border-gray-400"
-                      }`}
+                      className={`w-6 h-6 flex items-center justify-center mr-4 border-2 rounded-md transition-all
+                        ${
+                          selectedCompetitors.includes(competitor)
+                            ? "bg-purple-500 border-purple-500 scale-110"
+                            : "border-gray-400 hover:border-purple-300"
+                        }`}
                     >
                       {selectedCompetitors.includes(competitor) && (
                         <svg
-                          className="w-4 h-4 text-white"
+                          className="w-4 h-4 text-white animate-scaleIn"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -105,26 +136,29 @@ const CompetitorSelection = () => {
             </div>
           </div>
         ) : (
-          <div className="text-center p-6 bg-purple-900/20 rounded-lg border border-purple-400/20">
+          <div className="animate-fadeInUp text-center p-6 bg-purple-900/20 rounded-lg border border-purple-400/20">
             <p className="text-purple-200">
               No competitors found for this category
             </p>
           </div>
         )}
 
-        <div className="mt-8">
+        <div className="mt-8 animate-fadeInUp">
           <button
             onClick={handleProceed}
             disabled={selectedCompetitors.length === 0}
-            className={`w-full px-8 py-4 text-lg font-semibold text-gray-100 rounded-xl shadow-2xl transition-all duration-200
+            className={`w-full px-8 py-4 text-lg font-semibold text-gray-100 rounded-xl shadow-2xl transition-all duration-300 
               ${
                 selectedCompetitors.length > 0
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-purple-500/20 hover:scale-[1.02]"
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-purple-500/20 hover:scale-[1.02] hover:bg-gradient-to-br transform-gpu"
                   : "bg-gray-700/50 cursor-not-allowed"
-              }`}
+              } relative overflow-hidden group`}
           >
-            Generate Comparative Analysis
-            <span className="ml-3 text-purple-200">→</span>
+            <span className="relative z-10">
+              Generate Comparative Analysis
+              <span className="ml-3 text-purple-200">→</span>
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
         </div>
       </div>
