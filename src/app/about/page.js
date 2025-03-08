@@ -1,45 +1,102 @@
+"use client";
 import React from "react";
 
 const AboutPage = () => {
   return (
-    <div className="container mx-auto p-6 text-white">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-purple-600 via-indigo-800 to-gray-900 bg-clip-text text-transparent">
-          About <span className="text-white">Our Platform</span>
-        </h1>
-        <p className="mt-4 text-lg text-gray-300">
-          Your ultimate destination for in-depth competitive product analysis.
-          Compare features, trends, and insights across multiple brands to make
-          informed decisions.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 p-8 font-sans">
+      <style jsx global>{`
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+      `}</style>
 
-      {/* About the Developer Section */}
-      <div className="bg-gradient-to-r from-gray-900 via-indigo-800 to-purple-600 text-white shadow-lg rounded-lg p-8">
-        <h2 className="text-3xl font-semibold mb-6 text-center">
-          What We Offer
-        </h2>
-        <div className="flex flex-col md:flex-row items-center">
-          {/* Developer Image */}
-          <img
-            src="https://via.placeholder.com/150"
-            alt="Developer"
-            className="w-40 h-40 rounded-full shadow-lg mb-6 md:mb-0 md:mr-8 border-4 border-white"
-          />
-          {/* Developer Details */}
-          <div>
-            <p className="text-lg leading-relaxed">
-              Our platform provides a detailed competitive analysis of products
-              from top brands. Whether you're researching smartphones, laptops,
-              or other tech gadgets, we help you compare key features, pricing,
-              and trends. Our intuitive search and filtering system ensures you
-              get the most relevant insights.
-            </p>
-            <p className="text-sm mt-4 italic">
-              "Bringing clarity to product choices through innovation and
-              technology."
-            </p>
-            <p className="mt-2 text-sm">Location: India</p>
+      <div className="max-w-4xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-5xl font-extrabold mb-6 bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
+            About Our Platform
+          </h1>
+          <p className="text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
+            Advanced competitive intelligence platform providing market
+            insights, product comparisons, and strategic analytics for modern
+            businesses.
+          </p>
+        </div>
+
+        {/* Content Section */}
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-8">
+          <div className="space-y-8">
+            <h2 className="text-3xl font-bold text-purple-200 mb-6 text-center">
+              Platform Capabilities
+            </h2>
+
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              {/* Image Container */}
+              <div className="shrink-0 relative group">
+                <div className="w-48 h-48 rounded-2xl border-2 border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
+                  <img
+                    src="https://via.placeholder.com/150"
+                    alt="Platform Overview"
+                    className="w-full h-full object-cover transform transition-all duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-purple-400/30 rounded-2xl transition-all duration-300" />
+              </div>
+
+              {/* Content */}
+              <div className="space-y-4">
+                <p className="text-gray-300 leading-relaxed">
+                  Our analytics engine processes millions of data points to
+                  deliver comprehensive product comparisons across top brands.
+                  Leverage AI-powered insights to understand market trends,
+                  feature parity, and competitive positioning.
+                </p>
+
+                <div className="border-l-4 border-purple-500 pl-4 my-6">
+                  <p className="text-gray-400 italic">
+                    "Empowering data-driven decisions through intuitive
+                    analytics and visual storytelling."
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+                  <span className="text-sm text-gray-400">
+                    Based in India • Serving global markets
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature Grid */}
+            <div className="grid md:grid-cols-2 gap-6 mt-12">
+              {[
+                {
+                  title: "Market Insights",
+                  content: "Real-time trend analysis and demand forecasting",
+                },
+                {
+                  title: "Feature Analysis",
+                  content: "Detailed technical specifications comparison",
+                },
+                {
+                  title: "Strategic Reports",
+                  content: "Customizable competitive positioning documents",
+                },
+                {
+                  title: "API Access",
+                  content: "Integrate insights directly into your workflows",
+                },
+              ].map((feature, index) => (
+                <div
+                  key={index}
+                  className="p-6 bg-white/5 rounded-xl border border-white/10 hover:border-purple-400/30 transition-all duration-200"
+                >
+                  <h3 className="text-lg font-semibold text-purple-300 mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm">{feature.content}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
