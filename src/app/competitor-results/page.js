@@ -122,6 +122,12 @@ const SearchPage = () => {
     );
   };
 
+  const handleResetFilters = () => {
+    setSelectedProducts([]);
+    setSelectedFeatures([]);
+    setDeselectedMyCompany(new Set());
+  };
+
   const trendData = {
     labels: brandList,
     datasets: [
@@ -233,6 +239,15 @@ const SearchPage = () => {
                 </label>
               ))}
             </div>
+          </div>
+
+          <div className="mt-8">
+            <button
+              onClick={handleResetFilters}
+              className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
+            >
+              🔄 Reset All Filters
+            </button>
           </div>
         </div>
 
