@@ -1,3 +1,6 @@
+/**
+ * COMPETITIVE ANALYSIS DATABASE SCHEMA v1
+ */
 export const category = ["electronics", "fashion", "home", "beauty", "sports"];
 
 export const categoryCompetitors = {

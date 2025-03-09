@@ -253,7 +253,7 @@ const SearchPage = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-8 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10">
-          <h2 className="text-4xl font-extrabold text-center mb-8 bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text">
+          <h2 className="text-4xl font-extrabold text-center mb-8 bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text animate-shake">
             <span className="inline-block mr-2">📊</span>
             <span className="bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
               {query} Competitive Analysis
