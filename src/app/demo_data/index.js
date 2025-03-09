@@ -316,3 +316,116 @@ export const myCompanyProducts = [
   },
   // 4 more sports entries...
 ];
+
+//================================================================================================================
+/**
+ * COMPETITIVE ANALYSIS DATABASE SCHEMA
+ * Relationships:
+ * 1. Categories have many Competitors and Products
+ * 2. Competitors have many Products
+ * 3. Products have many Features and Reviews, and one Insight
+ * 4. MyCompany Products have null competitor_id
+ */
+
+// ==================== CATEGORIES TABLE ====================
+export const categories = [
+  {
+    id: "CAT_1",
+    name: "electronics",
+    created_at: "2023-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "CAT_2",
+    name: "fashion",
+    created_at: "2023-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+];
+
+// ==================== COMPETITORS TABLE ====================
+export const competitors = [
+  {
+    id: "COMP_1",
+    name: "Apple",
+    category_id: "CAT_1",
+    created_at: "2020-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "COMP_2",
+    name: "Samsung",
+    category_id: "CAT_1",
+    created_at: "2020-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+];
+
+// ==================== PRODUCTS TABLE ====================
+export const products = [
+  {
+    id: "PROD_1",
+    name: "XPhone 15",
+    category_id: "CAT_1",
+    competitor_id: null,
+    is_my_company: true,
+    price: 899,
+    created_at: "2023-06-01T00:00:00Z",
+    updated_at: "2024-02-01T00:00:00Z",
+  },
+  {
+    id: "PROD_2",
+    name: "iPhone 15 Pro",
+    category_id: "CAT_1",
+    competitor_id: "COMP_1",
+    is_my_company: false,
+    price: 999,
+    created_at: "2023-05-01T00:00:00Z",
+    updated_at: "2024-01-15T00:00:00Z",
+  },
+];
+
+// ==================== FEATURES TABLE ====================
+export const features = [
+  {
+    id: "FEAT_1",
+    product_id: "PROD_1",
+    key: "Holographic Display",
+    value: true,
+    created_at: "2023-06-01T00:00:00Z",
+  },
+  {
+    id: "FEAT_2",
+    product_id: "PROD_1",
+    key: "Neural Processor",
+    value: true,
+    created_at: "2023-06-01T00:00:00Z",
+  },
+];
+
+// ==================== INSIGHTS TABLE ====================
+export const insights = [
+  {
+    id: "INS_1",
+    product_id: "PROD_1",
+    popularity: "High",
+    price_trend: "Stable",
+    demand: "Growing",
+    market_share: "8%",
+    created_at: "2023-06-01T00:00:00Z",
+    updated_at: "2024-02-01T00:00:00Z",
+  },
+];
+
+// ==================== REVIEWS TABLE ====================
+export const reviews = [
+  {
+    id: "REV_1",
+    product_id: "PROD_1",
+    user: "EarlyAdopter",
+    rating: 4.3,
+    comment: "Innovative display tech",
+    date: "2024-03-20T00:00:00Z",
+    created_at: "2024-03-20T00:00:00Z",
+  },
+];
