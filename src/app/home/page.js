@@ -6,6 +6,7 @@ import { category } from "../demo_data";
 import Lottie from "lottie-react";
 import analyticsAnimation from "../../../public/assets/animations/analytics-animation.json";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
+import "../../../public/assets/css/HomePage.css"; // Import the CSS
 
 const categoryLabels = {
   electronics: "Electronics",
@@ -41,15 +42,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4 font-sans relative overflow-hidden">
-      <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
-        body {
-          font-family: "Inter", sans-serif;
-          overflow-x: hidden;
-        }
-      `}</style>
-
-      {/* Full-page Sparkles Animation */}
+      {/* Sparkles Background */}
       <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
         <Lottie
           animationData={sparklesAnimation}
@@ -63,7 +56,7 @@ const HomePage = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/30 via-transparent to-purple-900/30" />
       </div>
 
-      {/* Rest of the content remains the same */}
+      {/* Main Content */}
       <div
         className={`w-full max-w-2xl p-8 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10
         transform transition-all duration-1000 relative z-10 ${
