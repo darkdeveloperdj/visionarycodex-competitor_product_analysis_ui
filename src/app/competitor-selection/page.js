@@ -2,6 +2,9 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { categoryCompetitors } from "../demo_data";
+import Lottie from "lottie-react";
+import selectionAnimation from "../../../public/assets/animations/selection-animation.json";
+import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 
 const CompetitorSelection = () => {
   const searchParams = useSearchParams();
@@ -34,39 +37,45 @@ const CompetitorSelection = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4 font-sans relative overflow-hidden">
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
         body {
           font-family: "Inter", sans-serif;
         }
-
-        @keyframes float {
-          0% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-          100% {
-            transform: translateY(0px);
-          }
-        }
-
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
-        }
       `}</style>
+
+      {/* Background Animation */}
+      <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
+        <Lottie
+          animationData={sparklesAnimation}
+          loop={true}
+          autoplay={true}
+          className="w-full h-full"
+          rendererSettings={{
+            preserveAspectRatio: "xMidYMid slice",
+          }}
+        />
+      </div>
 
       <div
         className={`w-full max-w-2xl p-8 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10
-        transform transition-all duration-1000 ${
+        transform transition-all duration-1000 relative z-10 ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
       >
-        <h1 className="text-4xl font-extrabold text-center mb-6 bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent animate-float">
-          Competitor Selection
-        </h1>
+        {/* Header Animation */}
+        <div className="relative h-48 mb-4 -mt-12 ">
+          <Lottie
+            animationData={selectionAnimation}
+            loop={true}
+            autoplay={true}
+            className="w-40 h-40 mx-auto"
+          />
+          <h1 className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl font-extrabold text-center w-full bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
+            Competitor Selection
+          </h1>
+        </div>
 
         <div className="text-center mb-8">
           <p className="text-lg text-purple-200">
@@ -91,7 +100,7 @@ const CompetitorSelection = () => {
                 <label
                   key={competitor}
                   className={`flex items-center p-4 rounded-xl border transition-all duration-200 cursor-pointer 
-                    animate-fadeInUp hover:scale-[1.02] ${
+                    animate-fadeInUp hover:scale-[1.02] group ${
                       selectedCompetitors.includes(competitor)
                         ? "border-purple-500 bg-purple-900/30 shadow-purple-500/20"
                         : "border-white/10 hover:border-purple-400/30 bg-white/5"
@@ -104,7 +113,7 @@ const CompetitorSelection = () => {
                     onChange={() => toggleCompetitor(competitor)}
                     className="hidden"
                   />
-                  <div className="flex items-center">
+                  <div className="flex items-center w-full">
                     <div
                       className={`w-6 h-6 flex items-center justify-center mr-4 border-2 rounded-md transition-all
                         ${
@@ -114,22 +123,23 @@ const CompetitorSelection = () => {
                         }`}
                     >
                       {selectedCompetitors.includes(competitor) && (
-                        <svg
-                          className="w-4 h-4 text-white animate-scaleIn"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="3"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
+                        <Lottie
+                          animationData={require("../../../public/assets/animations/checkmark.json")} // Add checkmark animation
+                          loop={false}
+                          autoplay={true}
+                          className="w-4 h-4"
+                        />
                       )}
                     </div>
-                    <span className="text-gray-100 text-lg">{competitor}</span>
+                    <span className="text-gray-100 text-lg flex-1">
+                      {competitor}
+                    </span>
+                    <Lottie
+                      animationData={require("../../../public/assets/animations/sparkle.json")} // Add sparkle animation
+                      loop={true}
+                      autoplay={true}
+                      className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    />
                   </div>
                 </label>
               ))}
@@ -154,9 +164,14 @@ const CompetitorSelection = () => {
                   : "bg-gray-700/50 cursor-not-allowed"
               } relative overflow-hidden group`}
           >
-            <span className="relative z-10">
+            <span className="relative z-10 flex items-center justify-center">
               Generate Comparative Analysis
-              <span className="ml-3 text-purple-200">→</span>
+              <Lottie
+                animationData={sparklesAnimation}
+                loop={true}
+                autoplay={true}
+                className="w-8 h-8 ml-3 opacity-70"
+              />
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>

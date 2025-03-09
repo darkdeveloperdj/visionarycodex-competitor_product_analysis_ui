@@ -1,5 +1,7 @@
 "use client";
 import React from "react";
+import Lottie from "lottie-react";
+import groovyWalkAnimation from "../../../public/assets/animations/groovy-walk.json";
 
 const ContactPage = () => {
   return (
@@ -9,7 +11,7 @@ const ContactPage = () => {
       `}</style>
 
       <div className="w-full max-w-4xl bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Content Section */}
+        {/* Form Section (keep this same as before) */}
         <div className="space-y-8">
           <div className="text-center">
             <h1 className="text-4xl font-extrabold bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent mb-4">
@@ -22,7 +24,6 @@ const ContactPage = () => {
           </div>
 
           <form className="space-y-6">
-            {/* Name Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-purple-200">
                 Your Name
@@ -34,7 +35,6 @@ const ContactPage = () => {
               />
             </div>
 
-            {/* Email Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-purple-200">
                 Email Address
@@ -46,7 +46,6 @@ const ContactPage = () => {
               />
             </div>
 
-            {/* Message Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-purple-200">
                 Message
@@ -58,7 +57,6 @@ const ContactPage = () => {
               ></textarea>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               className="w-full px-6 py-3.5 text-lg font-semibold text-gray-100 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl shadow-lg hover:shadow-purple-500/20 hover:scale-[1.02] transition-all duration-200"
@@ -69,18 +67,20 @@ const ContactPage = () => {
           </form>
         </div>
 
-        {/* Info Section */}
+        {/* Animation Section with groovyWalk */}
         <div className="flex flex-col justify-center space-y-8">
-          <div className="relative group overflow-hidden rounded-2xl border border-white/10">
-            <img
-              src="https://via.placeholder.com/400x500"
-              alt="Contact"
-              className="w-full h-full object-cover transform transition-all duration-500 group-hover:scale-105"
-            />
+          <div className="relative group overflow-hidden rounded-2xl border border-white/10 h-[500px]">
+            <div className="absolute inset-0 flex items-center justify-center p-8">
+              <Lottie
+                animationData={groovyWalkAnimation}
+                loop={true}
+                autoplay={true}
+                className="w-full h-full hover:scale-105 transition-transform duration-300"
+              />
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent p-6 flex flex-col justify-end">
               <blockquote className="text-gray-300 italic">
-                "Data-driven decisions start with the right insights. Let's
-                build your competitive advantage."
+                "Let's walk together towards data-driven success"
               </blockquote>
             </div>
           </div>

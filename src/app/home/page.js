@@ -3,6 +3,9 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { category } from "../demo_data";
+import Lottie from "lottie-react";
+import analyticsAnimation from "../../../public/assets/animations/analytics-animation.json";
+import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 
 const categoryLabels = {
   electronics: "Electronics",
@@ -37,39 +40,48 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4 font-sans relative overflow-hidden">
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
         body {
           font-family: "Inter", sans-serif;
-        }
-
-        @keyframes float {
-          0% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-          100% {
-            transform: translateY(0px);
-          }
-        }
-
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
+          overflow-x: hidden;
         }
       `}</style>
 
+      {/* Full-page Sparkles Animation */}
+      <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
+        <Lottie
+          animationData={sparklesAnimation}
+          loop={true}
+          autoplay={true}
+          className="w-full h-full"
+          rendererSettings={{
+            preserveAspectRatio: "xMidYMid slice",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/30 via-transparent to-purple-900/30" />
+      </div>
+
+      {/* Rest of the content remains the same */}
       <div
         className={`w-full max-w-2xl p-8 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10
-        transform transition-all duration-1000 ${
+        transform transition-all duration-1000 relative z-10 ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
       >
-        <h1 className="text-4xl font-extrabold text-center mb-6 bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent animate-float">
-          Competitor Pro Analytics
-        </h1>
+        {/* Header Animation */}
+        <div className="relative h-48 mb-8 -mt-12">
+          <Lottie
+            animationData={analyticsAnimation}
+            loop={true}
+            autoplay={true}
+            className="h-full w-full"
+          />
+          <h1 className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl font-extrabold text-center w-full bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
+            Competitor Pro Analytics
+          </h1>
+        </div>
 
         <p className="text-center text-gray-300 mb-8 text-lg transition-opacity duration-500 hover:opacity-80">
           Discover market insights and competitive intelligence across
@@ -78,11 +90,11 @@ const HomePage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Category Selector */}
-          <div className="animate-fadeInUp delay-100">
+          <div className="animate-fadeInUp delay-100 relative group">
             <label className="block text-purple-200 text-sm font-medium mb-3">
               Product Category
             </label>
-            <div className="relative group">
+            <div className="relative">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -159,8 +171,14 @@ const HomePage = () => {
 
           {/* Search Preview */}
           {query && (
-            <div className="animate-fadeInUp text-center p-4 bg-purple-900/20 rounded-lg border border-purple-400/20 hover:scale-[1.01] transition-transform duration-300">
-              <p className="text-sm text-purple-200">
+            <div className="animate-fadeInUp text-center p-4 bg-purple-900/20 rounded-lg border border-purple-400/20 hover:scale-[1.01] transition-transform duration-300 relative">
+              <Lottie
+                animationData={sparklesAnimation}
+                loop={true}
+                autoplay={true}
+                className="absolute inset-0 w-full h-full opacity-20"
+              />
+              <p className="text-sm text-purple-200 relative z-10">
                 Analyzing market for{" "}
                 <span className="font-semibold text-purple-300 animate-pulse">
                   {query}
@@ -179,9 +197,14 @@ const HomePage = () => {
               type="submit"
               className="w-full px-8 py-4 text-lg font-semibold text-gray-100 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02] hover:bg-gradient-to-br transform-gpu active:scale-95 relative overflow-hidden group"
             >
-              <span className="relative z-10">
+              <span className="relative z-10 flex items-center justify-center">
                 Search and Select Competitor
-                <span className="ml-3 text-purple-200">→</span>
+                <Lottie
+                  animationData={sparklesAnimation}
+                  loop={true}
+                  autoplay={true}
+                  className="w-8 h-8 ml-3"
+                />
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>

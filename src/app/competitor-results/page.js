@@ -12,6 +12,8 @@ import {
   Legend,
 } from "chart.js";
 import { productData, myCompanyProducts } from "../demo_data";
+import Lottie from "lottie-react";
+import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 
 ChartJS.register(
   CategoryScale,
@@ -153,22 +155,43 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 text-gray-100 p-8 flex flex-col font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 text-gray-100 p-8 flex flex-col font-sans relative overflow-hidden">
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
         body {
           font-family: "Inter", sans-serif;
+          overflow-x: hidden;
         }
       `}</style>
 
+      {/* Sparkles Background Animation */}
+      <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
+        <Lottie
+          animationData={sparklesAnimation}
+          loop={true}
+          autoplay={true}
+          className="w-full h-full"
+          rendererSettings={{
+            preserveAspectRatio: "xMidYMid slice",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/30 via-transparent to-purple-900/30" />
+      </div>
+
+      {/* Existing content container - add relative z-10 */}
       <div
-        className={`flex gap-8 transform transition-all duration-1000 ${
+        className={`flex gap-8 transform transition-all duration-1000 relative z-10 ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
       >
         {/* Sidebar Filters */}
         <div className="w-80 p-6 bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 animate-fadeInLeft">
-          <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-purple-400 to-indigo-300 bg-clip-text text-transparent">
+          <h2
+            className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-purple-400 to-indigo-300 bg-clip-text text-transparent"
+            style={{
+              marginLeft: "-25px",
+            }}
+          >
             🔍 Comparison Filters
           </h2>
 

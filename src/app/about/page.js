@@ -29,14 +29,108 @@ const AboutPage = () => {
             </h2>
 
             <div className="flex flex-col md:flex-row items-center gap-8">
-              {/* Image Container */}
+              {/* Animated SVG Container */}
               <div className="shrink-0 relative group">
-                <div className="w-48 h-48 rounded-2xl border-2 border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
-                  <img
-                    src="https://via.placeholder.com/150"
-                    alt="Platform Overview"
-                    className="w-full h-full object-cover transform transition-all duration-500 group-hover:scale-105"
-                  />
+                <div className="w-48 h-48 rounded-2xl border-2 border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden flex items-center justify-center p-4">
+                  <svg
+                    viewBox="0 0 100 100"
+                    className="w-full h-full"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    {/* Animated Bar Chart */}
+                    <rect x="15" y="60" width="10" height="30" fill="#8B5CF6">
+                      <animate
+                        attributeName="height"
+                        from="0"
+                        to="30"
+                        dur="0.8s"
+                        fill="freeze"
+                      />
+                      <animate
+                        attributeName="y"
+                        from="90"
+                        to="60"
+                        dur="0.8s"
+                        fill="freeze"
+                      />
+                    </rect>
+
+                    <rect x="35" y="40" width="10" height="50" fill="#3B82F6">
+                      <animate
+                        attributeName="height"
+                        from="0"
+                        to="50"
+                        dur="0.8s"
+                        begin="0.2s"
+                        fill="freeze"
+                      />
+                      <animate
+                        attributeName="y"
+                        from="90"
+                        to="40"
+                        dur="0.8s"
+                        begin="0.2s"
+                        fill="freeze"
+                      />
+                    </rect>
+
+                    <rect x="55" y="30" width="10" height="60" fill="#EC4899">
+                      <animate
+                        attributeName="height"
+                        from="0"
+                        to="60"
+                        dur="0.8s"
+                        begin="0.4s"
+                        fill="freeze"
+                      />
+                      <animate
+                        attributeName="y"
+                        from="90"
+                        to="30"
+                        dur="0.8s"
+                        begin="0.4s"
+                        fill="freeze"
+                      />
+                    </rect>
+
+                    {/* Animated Line Graph */}
+                    <path
+                      d="M20 80 Q40 60 60 70 T100 50"
+                      stroke="url(#lineGradient)"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeDasharray="0 1000"
+                      fill="none"
+                    >
+                      <animate
+                        attributeName="stroke-dasharray"
+                        from="0 1000"
+                        to="1000 0"
+                        dur="1.5s"
+                        begin="0.6s"
+                        fill="freeze"
+                      />
+                    </path>
+
+                    {/* Data Points */}
+                    <circle cx="20" cy="80" r="2" fill="#A78BFA" />
+                    <circle cx="60" cy="70" r="2" fill="#A78BFA" />
+                    <circle cx="100" cy="50" r="2" fill="#A78BFA" />
+
+                    <defs>
+                      <linearGradient
+                        id="lineGradient"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="0%"
+                      >
+                        <stop offset="0%" stopColor="#8B5CF6" />
+                        <stop offset="100%" stopColor="#3B82F6" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
                 </div>
                 <div className="absolute inset-0 border-2 border-transparent group-hover:border-purple-400/30 rounded-2xl transition-all duration-300" />
               </div>
