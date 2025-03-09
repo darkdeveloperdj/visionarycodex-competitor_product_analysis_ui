@@ -317,14 +317,13 @@ export const myCompanyProducts = [
   // 4 more sports entries...
 ];
 
-//================================================================================================================
 /**
- * COMPETITIVE ANALYSIS DATABASE SCHEMA
- * Relationships:
- * 1. Categories have many Competitors and Products
- * 2. Competitors have many Products
- * 3. Products have many Features and Reviews, and one Insight
- * 4. MyCompany Products have null competitor_id
+ * COMPETITIVE ANALYSIS DATABASE SCHEMA v2
+ * Key Relationships:
+ * - Categories contain Products and Competitors
+ * - Products can have multiple Competitors through ProductCompetitors
+ * - MyCompany products (is_my_company=true) use ProductCompetitors for comparisons
+ * - Competitor products (is_my_company=false) have direct competitor_id
  */
 
 // ==================== CATEGORIES TABLE ====================
@@ -361,13 +360,12 @@ export const competitors = [
   },
 ];
 
-// ==================== PRODUCTS TABLE ====================
+// ==================== PRODUCTS TABLE (UPDATED) ====================
 export const products = [
   {
     id: "PROD_1",
     name: "XPhone 15",
     category_id: "CAT_1",
-    competitor_id: null,
     is_my_company: true,
     price: 899,
     created_at: "2023-06-01T00:00:00Z",
@@ -382,6 +380,30 @@ export const products = [
     price: 999,
     created_at: "2023-05-01T00:00:00Z",
     updated_at: "2024-01-15T00:00:00Z",
+  },
+  {
+    id: "PROD_3",
+    name: "Galaxy S24",
+    category_id: "CAT_1",
+    competitor_id: "COMP_2",
+    is_my_company: false,
+    price: 1099,
+    created_at: "2023-05-15T00:00:00Z",
+    updated_at: "2024-01-20T00:00:00Z",
+  },
+];
+
+// ==================== PRODUCT_COMPETITORS TABLE (NEW) ====================
+export const product_competitors = [
+  {
+    product_id: "PROD_1", // MyCompany product
+    competitor_id: "COMP_1", // Apple
+    created_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    product_id: "PROD_1", // MyCompany product
+    competitor_id: "COMP_2", // Samsung
+    created_at: "2024-01-01T00:00:00Z",
   },
 ];
 
