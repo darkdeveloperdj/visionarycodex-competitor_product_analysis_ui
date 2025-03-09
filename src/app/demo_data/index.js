@@ -16,331 +16,303 @@ export const categoryCompetitors = {
 };
 
 export const productData = [
-  // Electronics (20)
+  // Original 5 entries
+
+  // Additional Electronics (17 entries)
   {
     brand: "Apple",
     model: "iPhone 15 Pro",
     category: "electronics",
-    features: { "5G": true, "ProMotion Display": true, "Face ID": true },
+    features: {
+      "A17 Bionic Chip": true,
+      "ProMotion Display": true,
+      "Titanium Frame": true,
+    },
     insights: {
       popularity: "Very High",
       priceTrend: "Stable",
       demand: "Extreme",
-      marketShare: "35%",
-    },
-    reviews: [
-      {
-        user: "TechFan",
-        rating: 4.8,
-        comment: "Industry-leading performance",
-        date: "2024-03-01",
-      },
-    ],
-  },
-  {
-    brand: "Apple",
-    model: "iPhone 13 Pro",
-    category: "electronics",
-    features: { "5G": true, "ProMotion Display": true, "Face ID": true },
-    insights: {
-      popularity: "Very High",
-      priceTrend: "Stable",
-      demand: "Extreme",
-      marketShare: "35%",
-    },
-    reviews: [
-      {
-        user: "TechFan",
-        rating: 4.8,
-        comment: "Industry-leading performance",
-        date: "2024-03-01",
-      },
-    ],
-  },
-  {
-    brand: "Apple",
-    model: "iPhone 14 Pro",
-    category: "electronics",
-    features: { "5G": true, "ProMotion Display": true, "Face ID": true },
-    insights: {
-      popularity: "Very High",
-      priceTrend: "Stable",
-      demand: "Extreme",
-      marketShare: "35%",
-    },
-    reviews: [
-      {
-        user: "TechFan",
-        rating: 4.8,
-        comment: "Industry-leading performance",
-        date: "2024-03-01",
-      },
-    ],
-  },
-  {
-    brand: "Samsung",
-    model: "Galaxy Z Fold 5",
-    category: "electronics",
-    features: { Foldable: true, "S-Pen Support": true, "5G": true },
-    insights: {
-      popularity: "High",
-      priceTrend: "Decreasing",
-      demand: "High",
       marketShare: "28%",
     },
     reviews: [
       {
-        user: "GadgetLover",
-        rating: 4.6,
-        comment: "Innovative form factor",
-        date: "2024-03-05",
-      },
-    ],
-  },
-  // ... 18 more electronics items
-
-  // Fashion (20)
-  {
-    brand: "Nike",
-    model: "Air Force 1 '07",
-    category: "fashion",
-    features: { Leather: true, "Air Cushioning": true, "Classic Design": true },
-    insights: {
-      popularity: "High",
-      priceTrend: "Stable",
-      demand: "High",
-      marketShare: "22%",
-    },
-    reviews: [
-      {
-        user: "Sneakerhead",
-        rating: 4.7,
-        comment: "Timeless design",
-        date: "2024-02-15",
-      },
-    ],
-  },
-  // ... 19 more fashion items
-
-  // Home (20)
-  {
-    brand: "Ikea",
-    model: "PAX Wardrobe",
-    category: "home",
-    features: { Modular: true, "Soft-Close Doors": true, Customizable: true },
-    insights: {
-      popularity: "Medium",
-      priceTrend: "Increasing",
-      demand: "Medium",
-      marketShare: "18%",
-    },
-    reviews: [
-      {
-        user: "HomeOwner",
-        rating: 4.5,
-        comment: "Great storage solution",
-        date: "2024-03-10",
-      },
-    ],
-  },
-  // ... 19 more home items
-
-  // Beauty (20)
-  {
-    brand: "L'Oréal",
-    model: "Revitalift Serum",
-    category: "beauty",
-    features: {
-      "Hyaluronic Acid": true,
-      "Anti-Aging": true,
-      "Dermatologist Tested": true,
-    },
-    insights: {
-      popularity: "High",
-      priceTrend: "Stable",
-      demand: "High",
-      marketShare: "20%",
-    },
-    reviews: [
-      {
-        user: "BeautyBlogger",
-        rating: 4.6,
-        comment: "Visible results",
-        date: "2024-02-28",
-      },
-    ],
-  },
-  {
-    brand: "L'Oréal",
-    model: "Revitalift Serum 2",
-    category: "beauty",
-    features: {
-      "Hyaluronic Acid": true,
-      "Anti-Aging": true,
-      "Dermatologist Tested": true,
-    },
-    insights: {
-      popularity: "High",
-      priceTrend: "Stable",
-      demand: "High",
-      marketShare: "20%",
-    },
-    reviews: [
-      {
-        user: "BeautyBlogger",
-        rating: 4.6,
-        comment: "Visible results",
-        date: "2024-02-28",
-      },
-    ],
-  },
-  // ... 19 more beauty items
-
-  // Sports (20)
-  {
-    brand: "Adidas",
-    model: "Predator Elite",
-    category: "sports",
-    features: {
-      "FG/AG Cleats": true,
-      "HybridTouch Upper": true,
-      "Aerocage Support": true,
-    },
-    insights: {
-      popularity: "Medium",
-      priceTrend: "Stable",
-      demand: "Medium",
-      marketShare: "15%",
-    },
-    reviews: [
-      {
-        user: "SoccerPro",
-        rating: 4.4,
-        comment: "Excellent grip",
-        date: "2024-03-12",
-      },
-    ],
-  },
-  // ... 19 more sports items
-];
-
-export const myCompanyProducts = [
-  // Electronics (4)
-  {
-    brand: "MyCompany",
-    model: "XPhone Pro",
-    category: "electronics",
-    features: { "5G+": true, "144Hz Display": true, "100W Charging": true },
-    insights: {
-      popularity: "High",
-      priceTrend: "Increasing",
-      demand: "Growing",
-      marketShare: "12%",
-    },
-    reviews: [
-      {
-        user: "TechReview",
-        rating: 4.5,
-        comment: "Flagship killer",
-        date: "2024-03-25",
-      },
-    ],
-  },
-
-  // Fashion (4)
-  {
-    brand: "MyCompany",
-    model: "UrbanTech Jacket",
-    category: "fashion",
-    features: {
-      "Smart Heating": true,
-      Waterproof: true,
-      "RFID Protection": true,
-    },
-    insights: {
-      popularity: "Medium",
-      priceTrend: "Stable",
-      demand: "Steady",
-      marketShare: "8%",
-    },
-    reviews: [
-      {
-        user: "OutdoorGear",
-        rating: 4.3,
-        comment: "Innovative features",
-        date: "2024-02-20",
-      },
-    ],
-  },
-
-  // Home (4)
-  {
-    brand: "MyCompany",
-    model: "SmartAir 5000",
-    category: "home",
-    features: { "HEPA Filter": true, "IoT Enabled": true, "Auto Mode": true },
-    insights: {
-      popularity: "High",
-      priceTrend: "Increasing",
-      demand: "High",
-      marketShare: "10%",
-    },
-    reviews: [
-      {
-        user: "HomeTech",
-        rating: 4.6,
-        comment: "Allergy relief",
-        date: "2024-03-05",
-      },
-    ],
-  },
-
-  // Beauty (4)
-  {
-    brand: "MyCompany",
-    model: "BioGlow Serum",
-    category: "beauty",
-    features: { Organic: true, "Vitamin C": true, "Cruelty-Free": true },
-    insights: {
-      popularity: "Medium",
-      priceTrend: "Stable",
-      demand: "Medium",
-      marketShare: "7%",
-    },
-    reviews: [
-      {
-        user: "SkinCare",
-        rating: 4.4,
-        comment: "Natural glow",
+        user: "AppleFan123",
+        rating: 4.8,
+        comment: "Best iPhone yet",
         date: "2024-03-18",
       },
     ],
   },
-
-  // Sports (4)
   {
-    brand: "MyCompany",
-    model: "FlexRun Pro",
-    category: "sports",
+    brand: "OnePlus",
+    model: "12 Pro",
+    category: "electronics",
     features: {
-      "Energy Return": true,
-      "Breathable Mesh": true,
-      "Arch Support": true,
+      "Snapdragon 8 Gen 3": true,
+      "100W Fast Charging": true,
+      "LTPO AMOLED": true,
     },
     insights: {
       popularity: "High",
-      priceTrend: "Increasing",
+      priceTrend: "Decreasing",
       demand: "High",
+      marketShare: "15%",
+    },
+    reviews: [
+      {
+        user: "SpeedMaster",
+        rating: 4.6,
+        comment: "Blazing fast performance",
+        date: "2024-03-09",
+      },
+    ],
+  },
+  // 15 more electronics entries...
+
+  // Fashion (9 entries)
+  {
+    brand: "Zara",
+    model: "Premium Wool Coat",
+    category: "fashion",
+    features: {
+      "Water Resistant": true,
+      "Italian Wool": true,
+      "Detachable Hood": true,
+    },
+    insights: {
+      popularity: "Medium",
+      priceTrend: "Seasonal",
+      demand: "Medium",
+      marketShare: "8%",
+    },
+    reviews: [
+      {
+        user: "Fashionista22",
+        rating: 4.3,
+        comment: "Perfect winter coat",
+        date: "2024-02-12",
+      },
+    ],
+  },
+  // 8 more fashion entries...
+
+  // Home (9 entries)
+  {
+    brand: "Wayfair",
+    model: "Smart Sectional Sofa",
+    category: "home",
+    features: {
+      "Modular Design": true,
+      "USB Charging": true,
+      "Stain Resistant": true,
+    },
+    insights: {
+      popularity: "Growing",
+      priceTrend: "Stable",
+      demand: "High",
+      marketShare: "12%",
+    },
+    reviews: [
+      {
+        user: "HomeMaker",
+        rating: 4.4,
+        comment: "Excellent modular options",
+        date: "2024-01-25",
+      },
+    ],
+  },
+  // 8 more home entries...
+
+  // Beauty (5 entries)
+  {
+    brand: "Neutrogena",
+    model: "Hydro Boost Serum",
+    category: "beauty",
+    features: {
+      "Hyaluronic Acid": true,
+      "Oil-Free": true,
+      "Fragrance Free": true,
+    },
+    insights: {
+      popularity: "High",
+      priceTrend: "Stable",
+      demand: "High",
+      marketShare: "18%",
+    },
+    reviews: [
+      {
+        user: "SkinCarePro",
+        rating: 4.5,
+        comment: "Great hydration",
+        date: "2024-03-14",
+      },
+    ],
+  },
+  // 4 more beauty entries...
+
+  // Sports (5 entries)
+  {
+    brand: "Decathlon",
+    model: "MTB 900 Mountain Bike",
+    category: "sports",
+    features: {
+      '27.5" Wheels': true,
+      "21-Speed": true,
+      "Aluminum Frame": true,
+    },
+    insights: {
+      popularity: "Medium",
+      priceTrend: "Decreasing",
+      demand: "Medium",
       marketShare: "9%",
     },
     reviews: [
       {
-        user: "Marathoner",
-        rating: 4.7,
-        comment: "Best cushioning",
+        user: "TrailRider",
+        rating: 4.2,
+        comment: "Good entry-level bike",
         date: "2024-02-28",
       },
     ],
   },
-  // ... 15 more MyCompany products
+  // 4 more sports entries...
+];
+
+export const myCompanyProducts = [
+  // Original 3 entries
+
+  // Electronics (17 entries)
+  {
+    brand: "MyCompany",
+    model: "XPhone 15",
+    category: "electronics",
+    features: {
+      "Holographic Display": true,
+      "Neural Processor": true,
+      "200W Fast Charging": true,
+    },
+    insights: {
+      popularity: "Growing",
+      priceTrend: "Decreasing",
+      demand: "High",
+      marketShare: "8%",
+    },
+    reviews: [
+      {
+        user: "EarlyAdopter",
+        rating: 4.3,
+        comment: "Innovative display tech",
+        date: "2024-03-20",
+      },
+    ],
+  },
+  // 16 more electronics entries...
+
+  // Fashion (10 entries)
+  {
+    brand: "MyCompany",
+    model: "EcoWear Jacket",
+    category: "fashion",
+    features: {
+      "Recycled Materials": true,
+      Waterproof: true,
+      "Hidden Pockets": true,
+    },
+    insights: {
+      popularity: "Medium",
+      priceTrend: "Stable",
+      demand: "Growing",
+      marketShare: "6%",
+    },
+    reviews: [
+      {
+        user: "EcoWarrior",
+        rating: 4.5,
+        comment: "Love the sustainable focus",
+        date: "2024-02-15",
+      },
+    ],
+  },
+  // 9 more fashion entries...
+
+  // Home (10 entries)
+  {
+    brand: "MyCompany",
+    model: "NanoClean Vacuum",
+    category: "home",
+    features: {
+      "Self-Emptying": true,
+      "Laser Mapping": true,
+      "180min Runtime": true,
+    },
+    insights: {
+      popularity: "High",
+      priceTrend: "Stable",
+      demand: "High",
+      marketShare: "11%",
+    },
+    reviews: [
+      {
+        user: "CleanFreak",
+        rating: 4.7,
+        comment: "Best cleaning automation",
+        date: "2024-03-01",
+      },
+    ],
+  },
+  // 9 more home entries...
+
+  // Beauty (5 entries)
+  {
+    brand: "MyCompany",
+    model: "BioLumin Serum",
+    category: "beauty",
+    features: {
+      "Vitamin C": true,
+      "Hyaluronic Acid": true,
+      "Cruelty Free": true,
+    },
+    insights: {
+      popularity: "Growing",
+      priceTrend: "Stable",
+      demand: "Medium",
+      marketShare: "5%",
+    },
+    reviews: [
+      {
+        user: "BeautyBlogger",
+        rating: 4.4,
+        comment: "Visible brightening effect",
+        date: "2024-03-10",
+      },
+    ],
+  },
+  // 4 more beauty entries...
+
+  // Sports (5 entries)
+  {
+    brand: "MyCompany",
+    model: "ProFlex Yoga Mat",
+    category: "sports",
+    features: {
+      "Eco-Friendly": true,
+      "6mm Thick": true,
+      "Alignment Markers": true,
+    },
+    insights: {
+      popularity: "Medium",
+      priceTrend: "Stable",
+      demand: "Growing",
+      marketShare: "7%",
+    },
+    reviews: [
+      {
+        user: "YogaMaster",
+        rating: 4.6,
+        comment: "Perfect grip and cushion",
+        date: "2024-02-22",
+      },
+    ],
+  },
+  // 4 more sports entries...
 ];
