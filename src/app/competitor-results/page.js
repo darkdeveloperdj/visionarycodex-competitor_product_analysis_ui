@@ -184,12 +184,11 @@ const SearchPage = () => {
 
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-purple-200">
-              📦 Select Products
+              Select Products
             </h3>
             {brandList.map((brand) => (
               <div key={brand} className="mb-4">
                 <h4 className="text-md font-bold mb-2 text-indigo-200">
-                  {brand === "MyCompany" ? "🚀 " : "🏷️ "}
                   {brand}
                 </h4>
                 <div className="space-y-2">
@@ -227,7 +226,7 @@ const SearchPage = () => {
 
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-purple-200">
-              🛠️ Feature Selection
+              Feature Selection
             </h3>
             <div className="space-y-2">
               {allFeatures.map((feature) => (
@@ -334,11 +333,21 @@ const SearchPage = () => {
             <h3 className="text-2xl font-bold mb-6 text-purple-200">
               💡 Market Insights
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div
+              className={`grid gap-4 ${
+                selectedProducts.length === 1
+                  ? "grid-cols-1"
+                  : selectedProducts.length === 2
+                  ? "grid-cols-2"
+                  : selectedProducts.length === 3
+                  ? "grid-cols-3"
+                  : "grid-cols-3"
+              }`}
+            >
               {selectedProducts.map((product) => (
                 <div
                   key={product.model}
-                  className="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-purple-400/30 transition-all duration-300 hover:scale-[1.02]"
+                  className="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-purple-400/30 transition-all duration-300"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-lg font-semibold text-purple-200">
@@ -403,109 +412,7 @@ const SearchPage = () => {
             </div>
           </div>
 
-          {/* Competitive Positioning */}
-          <div className="mb-12 animate-fadeInUp delay-300">
-            <h3 className="text-2xl font-bold mb-6 text-purple-200">
-              ⚔️ Competitive Positioning
-            </h3>
-            <div className="grid grid-cols-1 gap-6">
-              {selectedProducts
-                .filter((p) => p.brand === "MyCompany")
-                .map((myProduct) => (
-                  <div
-                    key={myProduct.model}
-                    className="bg-gradient-to-br from-purple-600/30 to-indigo-600/30 p-6 rounded-2xl border border-white/10"
-                  >
-                    <h4 className="text-xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-indigo-200">
-                      🥊 Competitive Analysis: {myProduct.model}
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {selectedProducts
-                        .filter((p) => p.brand !== "MyCompany")
-                        .map((competitor) => (
-                          <div
-                            key={competitor.model}
-                            className="bg-white/5 p-4 rounded-xl border border-white/10 hover:scale-[1.01] transition-all duration-200"
-                          >
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center space-x-3">
-                                <span className="font-medium text-purple-200">
-                                  {myProduct.model}
-                                </span>
-                                <span className="text-gray-400">⚔️ vs ⚔️</span>
-                                <span className="font-medium text-indigo-200">
-                                  {competitor.model}
-                                </span>
-                              </div>
-                              <span className="text-xs text-gray-400">
-                                {competitor.brand}
-                              </span>
-                            </div>
-                            {selectedFeatures.map((feature) => (
-                              <div
-                                key={feature}
-                                className="flex items-center justify-between py-2 border-b border-white/5 last:border-0"
-                              >
-                                <span
-                                  className={`text-lg ${
-                                    myProduct.features[feature]
-                                      ? "text-green-400"
-                                      : "text-red-400"
-                                  }`}
-                                >
-                                  {myProduct.features[feature] ? "✅" : "❌"}
-                                </span>
-                                <span className="text-xs text-gray-400 px-2">
-                                  {feature}
-                                </span>
-                                <span
-                                  className={`text-lg ${
-                                    competitor.features[feature]
-                                      ? "text-green-400"
-                                      : "text-red-400"
-                                  }`}
-                                >
-                                  {competitor.features[feature] ? "✅" : "❌"}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-
-          {/* Trend Analysis */}
-          <div className="mb-12 animate-fadeInUp delay-400">
-            <h3 className="text-2xl font-bold mb-6 text-purple-200">
-              📈 Market Trends
-            </h3>
-            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 hover:scale-[1.005] transition-all duration-300">
-              <Bar
-                data={trendData}
-                options={{
-                  responsive: true,
-                  plugins: {
-                    legend: {
-                      labels: { color: "#e2e8f0" },
-                    },
-                  },
-                  scales: {
-                    x: {
-                      grid: { color: "rgba(255,255,255,0.05)" },
-                      ticks: { color: "#cbd5e1" },
-                    },
-                    y: {
-                      grid: { color: "rgba(255,255,255,0.05)" },
-                      ticks: { color: "#cbd5e1" },
-                    },
-                  },
-                }}
-              />
-            </div>
-          </div>
+          {/* Product Insights */}
 
           {/* Customer Reviews & Ratings */}
           <div className="mb-12 animate-fadeInUp delay-500">

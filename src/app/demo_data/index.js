@@ -209,6 +209,30 @@ export const myCompanyProducts = [
       },
     ],
   },
+  {
+    brand: "MyCompany",
+    model: "XPhone 19",
+    category: "electronics",
+    features: {
+      "Holographic Display 2": true,
+      "Neural Processor": true,
+      "200W Fast Charging": true,
+    },
+    insights: {
+      popularity: "Growing",
+      priceTrend: "Decreasing",
+      demand: "High",
+      marketShare: "8%",
+    },
+    reviews: [
+      {
+        user: "EarlyAdopter",
+        rating: 4.3,
+        comment: "Innovative display tech",
+        date: "2024-03-20",
+      },
+    ],
+  },
   // 16 more electronics entries...
 
   // Fashion (10 entries)
