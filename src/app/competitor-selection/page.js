@@ -39,7 +39,7 @@ const CompetitorSelection = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4 font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center p-4 font-sans relative overflow-hidden">
       {/* Background Animation */}
       <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
         <Lottie
@@ -54,7 +54,7 @@ const CompetitorSelection = () => {
       </div>
 
       <div
-        className={`w-full max-w-2xl p-8 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10
+        className={`w-full max-w-2xl p-8 bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200
         transform transition-all duration-1000 relative z-10 ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
@@ -67,19 +67,19 @@ const CompetitorSelection = () => {
             autoplay={true}
             className="w-40 h-40 mx-auto"
           />
-          <h1 className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl font-extrabold text-center w-full bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
+          <h1 className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl font-extrabold text-center w-full bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
             Competitor Selection
           </h1>
         </div>
 
         <div className="text-center mb-8">
-          <p className="text-lg text-purple-200">
+          <p className="text-lg text-gray-700">
             Analyzing:{" "}
-            <span className="font-semibold text-purple-300 animate-pulse">
+            <span className="font-semibold text-purple-600 animate-pulse">
               {query}
             </span>{" "}
             in{" "}
-            <span className="font-semibold text-indigo-300">
+            <span className="font-semibold text-indigo-600">
               {category.charAt(0).toUpperCase() + category.slice(1)}
             </span>
           </p>
@@ -87,7 +87,7 @@ const CompetitorSelection = () => {
 
         {competitors.length > 0 ? (
           <div className="space-y-4 mb-8">
-            <h2 className="text-xl font-semibold text-purple-200 mb-4 text-center animate-fadeInUp">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center animate-fadeInUp">
               Select Competitors ({selectedCompetitors.length} chosen)
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -97,8 +97,8 @@ const CompetitorSelection = () => {
                   className={`flex items-center p-4 rounded-xl border transition-all duration-200 cursor-pointer 
                     animate-fadeInUp hover:scale-[1.02] group ${
                       selectedCompetitors.includes(competitor)
-                        ? "border-purple-500 bg-purple-900/30 shadow-purple-500/20"
-                        : "border-white/10 hover:border-purple-400/30 bg-white/5"
+                        ? "border-purple-500 bg-purple-100 shadow-md"
+                        : "border-gray-200 hover:border-purple-300 bg-white"
                     }`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
@@ -126,7 +126,7 @@ const CompetitorSelection = () => {
                         />
                       )}
                     </div>
-                    <span className="text-gray-100 text-lg flex-1">
+                    <span className="text-gray-800 text-lg flex-1">
                       {competitor}
                     </span>
                     <Lottie
@@ -141,8 +141,8 @@ const CompetitorSelection = () => {
             </div>
           </div>
         ) : (
-          <div className="animate-fadeInUp text-center p-6 bg-purple-900/20 rounded-lg border border-purple-400/20">
-            <p className="text-purple-200">
+          <div className="animate-fadeInUp text-center p-6 bg-purple-50 rounded-lg border border-purple-200">
+            <p className="text-gray-700">
               No competitors found for this category
             </p>
           </div>
@@ -152,11 +152,11 @@ const CompetitorSelection = () => {
           <button
             onClick={handleProceed}
             disabled={selectedCompetitors.length === 0}
-            className={`w-full px-8 py-4 text-lg font-semibold text-gray-100 rounded-xl shadow-2xl transition-all duration-300 
+            className={`w-full px-8 py-4 text-lg font-semibold text-white rounded-xl shadow-lg transition-all duration-300 
               ${
                 selectedCompetitors.length > 0
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-purple-500/20 hover:scale-[1.02] hover:bg-gradient-to-br transform-gpu"
-                  : "bg-gray-700/50 cursor-not-allowed"
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-md hover:scale-[1.02]"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
               } relative overflow-hidden group`}
           >
             <span className="relative z-10 flex items-center justify-center">
