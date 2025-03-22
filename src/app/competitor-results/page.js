@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
-import { Bar } from "react-chartjs-2";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,7 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { productData, myCompanyProducts } from "../demo_data";
+import { setSelectedProducts } from "../store/product/productsSlice";
 import Lottie from "lottie-react";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/SearchPage.css";
@@ -46,74 +45,103 @@ const StarRating = ({ rating }) => {
   );
 };
 
-const allProducts = [...productData, ...myCompanyProducts];
+// Utility function to parse strings that aren’t valid JSON.
+const parseInvalidJson = (str) => {
+  try {
+    const validJson = str
+      .replace(/'/g, '"')
+      .replace(/\bTrue\b/g, "true")
+      .replace(/\bFalse\b/g, "false");
+    return JSON.parse(validJson);
+  } catch (error) {
+    console.error("Failed to parse JSON string:", str, error);
+    return {};
+  }
+};
 
 const SearchPage = () => {
-  const searchParams = useSearchParams();
-  const query = searchParams.get("query") || "Products";
-  const category = searchParams.get("category") || "electronics";
-  const brandList = searchParams.get("brands")
-    ? [...searchParams.get("brands").split(","), "MyCompany"]
-    : ["MyCompany"];
+  const dispatch = useDispatch();
+  // Read search parameters from Redux state
+  const {
+    productName,
+    companyNamesInput,
+    allProducts: apiProducts,
+    selectedProducts,
+  } = useSelector((state) => state.products);
 
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  // Use Redux values; fallback values provided if undefined.
+  const query = productName || "Products";
+  // Convert productName to lowercase for filtering (adjust as needed)
+  const category = productName ? productName.toLowerCase() : "electronics";
+  // Convert the company names input into an array
+  const brandList = companyNamesInput
+    ? companyNamesInput.split(",").map((brand) => brand.trim())
+    : [];
+
   const [selectedFeatures, setSelectedFeatures] = useState([]);
-  const [deselectedMyCompany, setDeselectedMyCompany] = useState(new Set());
+  // activeFilters holds a set of product models that are currently active in filtering.
+  const [activeFilters, setActiveFilters] = useState(new Set());
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Filter products by category from Redux
   const filteredProducts = useMemo(
-    () => allProducts.filter((product) => product.category === category),
-    [category]
+    () => apiProducts.filter((product) => product.category === category),
+    [apiProducts, category]
   );
 
+  // Group by brand for potential use in the sidebar
   const groupedProducts = useMemo(
     () =>
-      brandList.reduce((acc, brand) => {
+      (brandList.length
+        ? brandList
+        : [...new Set(filteredProducts.map((p) => p.brand))]
+      ).reduce((acc, brand) => {
         acc[brand] = filteredProducts.filter((p) => p.brand === brand);
         return acc;
       }, {}),
     [brandList, filteredProducts]
   );
 
+  // Determine available features from filtered products.
   const allFeatures = useMemo(
     () => [
       ...new Set(
-        filteredProducts.flatMap((product) => Object.keys(product.features))
+        filteredProducts.flatMap((product) =>
+          Object.keys(parseInvalidJson(product.features))
+        )
       ),
     ],
     [filteredProducts]
   );
 
+  // Whenever selectedProducts change, reset activeFilters to include all selected products.
   useEffect(() => {
-    const myCompanyProduct = filteredProducts.find(
-      (p) => p.brand === "MyCompany"
-    );
-
-    if (myCompanyProduct && !deselectedMyCompany.has(myCompanyProduct.model)) {
-      setSelectedProducts((prev) => {
-        const exists = prev.some((p) => p.model === myCompanyProduct.model);
-        return exists ? prev : [...prev, myCompanyProduct];
-      });
-    }
-  }, [category, filteredProducts, deselectedMyCompany]);
+    setActiveFilters(new Set(selectedProducts.map((product) => product.model)));
+  }, [selectedProducts]);
 
   const toggleProductSelection = (product) => {
-    setSelectedProducts((prev) => {
-      const newSelection = prev.some((p) => p.model === product.model)
-        ? prev.filter((p) => p.model !== product.model)
-        : [...prev, product];
+    let newSelection;
+    if (selectedProducts.some((p) => p.model === product.model)) {
+      newSelection = selectedProducts.filter((p) => p.model !== product.model);
+    } else {
+      newSelection = [...selectedProducts, product];
+    }
+    dispatch(setSelectedProducts(newSelection));
+  };
 
-      if (
-        product.brand === "MyCompany" &&
-        !newSelection.some((p) => p.model === product.model)
-      ) {
-        setDeselectedMyCompany((prev) => new Set([...prev, product.model]));
+  const toggleActiveFilter = (product) => {
+    setActiveFilters((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(product.model)) {
+        newSet.delete(product.model);
+      } else {
+        newSet.add(product.model);
       }
-      return newSelection;
+      return newSet;
     });
   };
 
@@ -125,35 +153,18 @@ const SearchPage = () => {
     );
   };
 
+  // Reset feature selections and active filters (keeping selected products intact)
   const handleResetFilters = () => {
-    setSelectedProducts([]);
     setSelectedFeatures([]);
-    setDeselectedMyCompany(new Set());
+    setActiveFilters(new Set(selectedProducts.map((p) => p.model)));
   };
 
-  const trendData = {
-    labels: brandList,
-    datasets: [
-      {
-        label: "Market Growth (%)",
-        data: brandList.map(() => Math.floor(Math.random() * 40) + 10),
-        backgroundColor: [
-          "rgba(99, 102, 241, 0.8)",
-          "rgba(139, 92, 246, 0.8)",
-          "rgba(168, 85, 247, 0.8)",
-          "rgba(217, 70, 239, 0.8)",
-        ],
-        borderColor: [
-          "rgba(99, 102, 241, 1)",
-          "rgba(139, 92, 246, 1)",
-          "rgba(168, 85, 247, 1)",
-          "rgba(217, 70, 239, 1)",
-        ],
-        borderWidth: 2,
-        borderRadius: 8,
-      },
-    ],
-  };
+  // Only active products are shown in the comparison table.
+  const activeSelectedProducts = useMemo(
+    () =>
+      selectedProducts.filter((product) => activeFilters.has(product.model)),
+    [selectedProducts, activeFilters]
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-800 p-8 flex flex-col font-sans relative overflow-hidden">
@@ -182,48 +193,32 @@ const SearchPage = () => {
             🔍 Comparison Filters
           </h2>
 
+          {/* Selected Products Section */}
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-gray-700">
-              Select Products
+              Selected Products
             </h3>
-            {brandList.map((brand) => (
-              <div key={brand} className="mb-4">
-                <h4 className="text-md font-bold mb-2 text-indigo-600">
-                  {brand}
-                </h4>
-                <div className="space-y-2">
-                  {groupedProducts[brand]?.map((product) => (
-                    <label
-                      key={product.model}
-                      className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
-                        selectedProducts.some((p) => p.model === product.model)
-                          ? "bg-indigo-100 border border-indigo-300 shadow-md scale-[1.02]"
-                          : "hover:bg-gray-50 border border-gray-200 hover:scale-[1.01]"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        className="form-checkbox h-4 w-4 text-purple-500 transition duration-150 ease-in-out"
-                        checked={selectedProducts.some(
-                          (p) => p.model === product.model
-                        )}
-                        onChange={() => toggleProductSelection(product)}
-                      />
-                      <span className="ml-3 text-sm text-gray-700">
-                        {product.model}
-                        {product.brand === "MyCompany" && (
-                          <span className="ml-2 text-xs text-yellow-600">
-                            (✨ Yours)
-                          </span>
-                        )}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ))}
+            <div className="space-y-2">
+              {selectedProducts.map((product) => (
+                <label
+                  key={product.model}
+                  className="flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 hover:bg-gray-50 border border-gray-200"
+                >
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-4 w-4 text-purple-500"
+                    checked={activeFilters.has(product.model)}
+                    onChange={() => toggleActiveFilter(product)}
+                  />
+                  <span className="ml-3 text-sm text-gray-700">
+                    {product.model}
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
 
+          {/* Feature Selection Section */}
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-gray-700">
               Feature Selection
@@ -294,37 +289,38 @@ const SearchPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedProducts.map((product, index) => (
-                    <tr
-                      key={index}
-                      className={`${
-                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                      } last:rounded-b-2xl transition-all duration-200 hover:bg-gray-100`}
-                    >
-                      <td className="p-4 text-sm font-medium">
-                        <span className="flex items-center text-gray-700">
-                          {product.brand}
-                          {product.brand === "MyCompany" && (
-                            <span className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full">
-                              🎯 Your Product
-                            </span>
-                          )}
-                        </span>
-                      </td>
-                      <td className="p-4 text-sm text-gray-600">
-                        {product.model}
-                      </td>
-                      {selectedFeatures.map((feature) => (
-                        <td key={feature} className="p-4 text-center text-2xl">
-                          {product.features[feature] ? (
-                            <span className="text-green-600">✅</span>
-                          ) : (
-                            <span className="text-red-600">❌</span>
-                          )}
+                  {activeSelectedProducts.map((product, index) => {
+                    const features = parseInvalidJson(product.features);
+                    return (
+                      <tr
+                        key={index}
+                        className={`${
+                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                        } last:rounded-b-2xl transition-all duration-200 hover:bg-gray-100`}
+                      >
+                        <td className="p-4 text-sm font-medium">
+                          <span className="flex items-center text-gray-700">
+                            {product.brand}
+                          </span>
                         </td>
-                      ))}
-                    </tr>
-                  ))}
+                        <td className="p-4 text-sm text-gray-600">
+                          {product.model}
+                        </td>
+                        {selectedFeatures.map((feature) => (
+                          <td
+                            key={feature}
+                            className="p-4 text-center text-2xl"
+                          >
+                            {features[feature] ? (
+                              <span className="text-green-600">✅</span>
+                            ) : (
+                              <span className="text-red-600">❌</span>
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -337,80 +333,76 @@ const SearchPage = () => {
             </h3>
             <div
               className={`grid gap-4 ${
-                selectedProducts.length === 1
+                activeSelectedProducts.length === 1
                   ? "grid-cols-1"
-                  : selectedProducts.length === 2
+                  : activeSelectedProducts.length === 2
                   ? "grid-cols-2"
-                  : selectedProducts.length === 3
-                  ? "grid-cols-3"
                   : "grid-cols-3"
               }`}
             >
-              {selectedProducts.map((product) => (
-                <div
-                  key={product.model}
-                  className="bg-white p-6 rounded-xl border border-gray-200 hover:border-purple-300 transition-all duration-300 shadow-sm"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-lg font-semibold text-gray-700">
-                      {product.model}
-                    </h4>
-                    {product.brand === "MyCompany" && (
-                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-                    )}
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">
-                        🚀 Popularity
-                      </span>
-                      <span
-                        className={`text-sm font-medium ${
-                          product.insights.popularity === "High"
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }`}
-                      >
-                        {product.insights.popularity === "High"
-                          ? "📈 High"
-                          : "📉 Low"}
-                      </span>
+              {activeSelectedProducts.map((product) => {
+                const insights = parseInvalidJson(product.insights);
+                return (
+                  <div
+                    key={product.model}
+                    className="bg-white p-6 rounded-xl border border-gray-200 hover:border-purple-300 transition-all duration-300 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-lg font-semibold text-gray-700">
+                        {product.model}
+                      </h4>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">
-                        💰 Price Trend
-                      </span>
-                      <span
-                        className={`text-sm font-medium ${
-                          product.insights.priceTrend === "Increasing"
-                            ? "text-red-600"
-                            : "text-green-600"
-                        }`}
-                      >
-                        {product.insights.priceTrend === "Increasing"
-                          ? "📈"
-                          : "📉"}{" "}
-                        {product.insights.priceTrend}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">🛒 Demand</span>
-                      <span className="text-sm font-medium text-indigo-600">
-                        {product.insights.demand === "High" ? "🔥 " : "🌱 "}
-                        {product.insights.demand}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">
-                        🏆 Market Share
-                      </span>
-                      <span className="text-sm font-medium text-purple-600">
-                        {product.insights.marketShare}
-                      </span>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">
+                          🚀 Popularity
+                        </span>
+                        <span
+                          className={`text-sm font-medium ${
+                            insights.popularity === "High"
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {insights.popularity === "High"
+                            ? "📈 High"
+                            : "📉 Low"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">
+                          💰 Price Trend
+                        </span>
+                        <span
+                          className={`text-sm font-medium ${
+                            insights.priceTrend === "Increasing"
+                              ? "text-red-600"
+                              : "text-green-600"
+                          }`}
+                        >
+                          {insights.priceTrend === "Increasing" ? "📈" : "📉"}{" "}
+                          {insights.priceTrend}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">🛒 Demand</span>
+                        <span className="text-sm font-medium text-indigo-600">
+                          {insights.demand === "High" ? "🔥" : "🌱"}{" "}
+                          {insights.demand}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">
+                          🏆 Market Share
+                        </span>
+                        <span className="text-sm font-medium text-purple-600">
+                          {insights.marketShare}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -420,12 +412,13 @@ const SearchPage = () => {
               😊 Customer Feedback Analysis
             </h3>
             <div className="space-y-6">
-              {selectedProducts.map((product) => {
+              {activeSelectedProducts.map((product) => {
+                const reviews = parseInvalidJson(product.reviews);
                 const avgRating =
-                  product.reviews.reduce(
-                    (sum, review) => sum + review.rating,
-                    0
-                  ) / product.reviews.length;
+                  Array.isArray(reviews) && reviews.length > 0
+                    ? reviews.reduce((sum, review) => sum + review.rating, 0) /
+                      reviews.length
+                    : 0;
 
                 return (
                   <div
@@ -444,49 +437,51 @@ const SearchPage = () => {
                           </span>
                         </div>
                         <span className="text-sm text-gray-500">
-                          📝 {product.reviews.length} reviews
+                          📝 {Array.isArray(reviews) ? reviews.length : 0}{" "}
+                          reviews
                         </span>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {product.reviews.map((review, index) => (
-                        <div
-                          key={index}
-                          className="bg-gray-50 p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-all duration-300"
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h5 className="font-medium text-gray-700">
-                                👤 {review.user}
-                              </h5>
-                              <p className="text-xs text-gray-500">
-                                📅{" "}
-                                {new Date(review.date).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  }
+                      {Array.isArray(reviews) &&
+                        reviews.map((review, index) => (
+                          <div
+                            key={index}
+                            className="bg-gray-50 p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-all duration-300"
+                          >
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <h5 className="font-medium text-gray-700">
+                                  👤 {review.user}
+                                </h5>
+                                <p className="text-xs text-gray-500">
+                                  📅{" "}
+                                  {new Date(review.date).toLocaleDateString(
+                                    "en-US",
+                                    {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    }
+                                  )}
+                                </p>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <StarRating rating={review.rating} />
+                                {review.rating >= 4 ? (
+                                  <span className="text-2xl">😍</span>
+                                ) : review.rating >= 3 ? (
+                                  <span className="text-2xl">😊</span>
+                                ) : (
+                                  <span className="text-2xl">😞</span>
                                 )}
-                              </p>
+                              </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <StarRating rating={review.rating} />
-                              {review.rating >= 4 ? (
-                                <span className="text-2xl">😍</span>
-                              ) : review.rating >= 3 ? (
-                                <span className="text-2xl">😊</span>
-                              ) : (
-                                <span className="text-2xl">😞</span>
-                              )}
-                            </div>
+                            <p className="text-sm text-gray-600 leading-relaxed">
+                              💭 {review.comment}
+                            </p>
                           </div>
-                          <p className="text-sm text-gray-600 leading-relaxed">
-                            💭 {review.comment}
-                          </p>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </div>
                 );

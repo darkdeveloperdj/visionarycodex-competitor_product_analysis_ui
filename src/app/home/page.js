@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { category } from "../demo_data";
@@ -7,6 +6,11 @@ import Lottie from "lottie-react";
 import analyticsAnimation from "../../../public/assets/animations/analytics-animation.json";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/HomePage.css";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setProductName,
+  setCompanyNamesInput,
+} from "../store/product/productsSlice";
 
 const categoryLabels = {
   electronics: "Electronics",
@@ -18,6 +22,10 @@ const categoryLabels = {
 
 const HomePage = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { productName, companyNamesInput } = useSelector(
+    (state) => state.products
+  );
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(category[0]);
   const [showError, setShowError] = useState(false);
@@ -27,17 +35,48 @@ const HomePage = () => {
     setMounted(true);
   }, []);
 
+  const formatBrandInput = (input) => {
+    return input
+      .split(",")
+      .map((brand) => {
+        const trimmed = brand.trim();
+        if (!trimmed) return "";
+        return (
+          trimmed.charAt(0).toUpperCase() +
+          trimmed
+            .slice(1)
+            .toLowerCase()
+            .replace(/[^a-zA-Z0-9 ]/g, "")
+        );
+      })
+      .filter((brand) => brand !== "")
+      .join(", ");
+  };
+
+  const handleInputChange = (value) => {
+    const formatted = value.replace(/,+/g, ",").replace(/,\s*/g, ", ");
+    setQuery(formatted);
+    setShowError(false);
+  };
+
+  const validateBrands = (input) => {
+    const formatted = input.replace(/, /g, ",");
+    const brandRegex = /^[A-Z][a-zA-Z0-9 ]*(,[A-Z][a-zA-Z0-9 ]*)*$/;
+    return brandRegex.test(formatted);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!query.trim()) {
+    const formattedQuery = query.replace(/, /g, ",").replace(/,,+/g, ",");
+    if (!formattedQuery || !validateBrands(formattedQuery)) {
       setShowError(true);
       return;
     }
-    router.push(
-      `/competitor-selection?query=${encodeURIComponent(
-        query
-      )}&category=${selectedCategory}`
-    );
+    // Save search parameters in Redux
+    dispatch(setProductName(selectedCategory));
+    dispatch(setCompanyNamesInput(formattedQuery));
+    // Navigate using the submitted values
+    router.push(`/products-selection`);
   };
 
   return (
@@ -58,8 +97,7 @@ const HomePage = () => {
 
       {/* Main Content */}
       <div
-        className={`w-full max-w-2xl p-8 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200
-        transform transition-all duration-1000 relative z-10 ${
+        className={`w-full max-w-2xl p-8 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 transform transition-all duration-1000 relative z-10 ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
       >
@@ -125,17 +163,15 @@ const HomePage = () => {
           {/* Search Input */}
           <div className="animate-fadeInUp delay-200">
             <label className="block text-gray-700 text-sm font-medium mb-3">
-              Product Search
+              Choose Brands
             </label>
             <div className="relative group">
               <input
                 type="text"
-                placeholder="Enter product name or keyword..."
+                placeholder="Example: Apple, Samsung, Google"
                 value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  setShowError(false);
-                }}
+                onChange={(e) => handleInputChange(e.target.value)}
+                onBlur={(e) => setQuery(formatBrandInput(e.target.value))}
                 className="w-full p-4 pl-12 pr-6 text-gray-700 bg-white/95 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 hover:border-purple-400 hover:shadow-md"
                 required
               />
@@ -155,9 +191,13 @@ const HomePage = () => {
                 </svg>
               </div>
             </div>
-            {showError && (
+            {showError ? (
               <p className="text-red-600 text-sm mt-2 ml-2 animate-shake">
-                Please enter a product name or keyword
+                Please enter brand names in the format: Brand1, Brand2, Brand3
+              </p>
+            ) : (
+              <p className="text-gray-500 text-sm mt-2 ml-2">
+                Separate brand names with commas (e.g., Apple, Samsung, Google)
               </p>
             )}
           </div>
