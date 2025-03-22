@@ -10,10 +10,7 @@ import {
 function* fetchProductsSaga(action) {
   try {
     const { category, companyNamesInput } = action.payload;
-
-    const apiUrl = `http://127.0.0.1:8000/fetch/?product_name=${encodeURIComponent(
-      category
-    )}&company_names_input=${encodeURIComponent(companyNamesInput)}`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/fetch/?product_name=${category}&company_names_input=${companyNamesInput}`;
 
     const response = yield call(axios.get, apiUrl);
     yield put(fetchProductsSuccess(response.data));
