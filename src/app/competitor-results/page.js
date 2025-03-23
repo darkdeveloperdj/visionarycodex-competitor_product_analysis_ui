@@ -52,7 +52,8 @@ const StarRating = ({ rating }) => {
 const parseInvalidJson = (str) => {
   try {
     const validJson = str
-      .replace(/'/g, '"')
+      .replace(/"/g, '\\"') // Escape existing double quotes first
+      .replace(/'/g, '"') // Replace single quotes with double quotes
       .replace(/\bTrue\b/g, "true")
       .replace(/\bFalse\b/g, "false");
     return JSON.parse(validJson);
