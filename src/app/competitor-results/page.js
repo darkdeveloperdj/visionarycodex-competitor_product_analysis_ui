@@ -119,19 +119,6 @@ const SearchPage = () => {
     [apiProducts, category]
   );
 
-  // Group by brand for potential use in the sidebar
-  const groupedProducts = useMemo(
-    () =>
-      (brandList.length
-        ? brandList
-        : [...new Set(filteredProducts.map((p) => p.brand))]
-      ).reduce((acc, brand) => {
-        acc[brand] = filteredProducts.filter((p) => p.brand === brand);
-        return acc;
-      }, {}),
-    [brandList, filteredProducts]
-  );
-
   // Determine available features from filtered products.
   const allFeatures = useMemo(
     () => [
@@ -148,16 +135,6 @@ const SearchPage = () => {
   useEffect(() => {
     setActiveFilters(new Set(selectedProducts.map((product) => product.model)));
   }, [selectedProducts]);
-
-  const toggleProductSelection = (product) => {
-    let newSelection;
-    if (selectedProducts.some((p) => p.model === product.model)) {
-      newSelection = selectedProducts.filter((p) => p.model !== product.model);
-    } else {
-      newSelection = [...selectedProducts, product];
-    }
-    dispatch(setSelectedProducts(newSelection));
-  };
 
   const toggleActiveFilter = (product) => {
     setActiveFilters((prev) => {
