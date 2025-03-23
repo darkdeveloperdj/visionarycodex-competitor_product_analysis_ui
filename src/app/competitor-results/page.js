@@ -263,7 +263,8 @@ const SearchPage = () => {
         {/* Main Content */}
         <div className="flex-1 p-8 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200">
           <h2 className="text-4xl font-extrabold text-center mb-8 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 bg-clip-text animate-shake">
-            📊 {query} Competitive Analysis
+            📊 {query.charAt(0).toUpperCase() + query.slice(1)} Competitive
+            Analysis
           </h2>
 
           {/* Product Comparison Table */}
