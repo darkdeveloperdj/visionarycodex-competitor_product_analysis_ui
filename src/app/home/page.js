@@ -35,47 +35,42 @@ const HomePage = () => {
     setMounted(true);
   }, []);
 
+  // Format input: trim, remove extra commas, and capitalize the first letter of each word.
   const formatBrandInput = (input) => {
     return input
       .split(",")
       .map((brand) => {
         const trimmed = brand.trim();
         if (!trimmed) return "";
-        return (
-          trimmed.charAt(0).toUpperCase() +
-          trimmed
-            .slice(1)
-            .toLowerCase()
-            .replace(/[^a-zA-Z0-9 ]/g, "")
-        );
+        return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
       })
       .filter((brand) => brand !== "")
       .join(", ");
   };
 
   const handleInputChange = (value) => {
+    // Replace multiple commas with a single comma and ensure spacing consistency.
     const formatted = value.replace(/,+/g, ",").replace(/,\s*/g, ", ");
     setQuery(formatted);
     setShowError(false);
   };
 
-  const validateBrands = (input) => {
-    const formatted = input.replace(/, /g, ",");
-    const brandRegex = /^[A-Z][a-zA-Z0-9 ]*(,[A-Z][a-zA-Z0-9 ]*)*$/;
-    return brandRegex.test(formatted);
+  const handleExampleClick = () => {
+    const example = "Google,Apple,Samsung";
+    setQuery(example);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formattedQuery = query.replace(/, /g, ",").replace(/,,+/g, ",");
-    if (!formattedQuery || !validateBrands(formattedQuery)) {
+    const formattedQuery = formatBrandInput(query);
+    if (!formattedQuery) {
       setShowError(true);
       return;
     }
-    // Save search parameters in Redux
+    // Save search parameters in Redux with formatted data.
     dispatch(setProductName(selectedCategory));
     dispatch(setCompanyNamesInput(formattedQuery));
-    // Navigate using the submitted values
+    // Navigate using the submitted values.
     router.push(`/products-selection`);
   };
 
@@ -168,7 +163,7 @@ const HomePage = () => {
             <div className="relative group">
               <input
                 type="text"
-                placeholder="Example: Apple, Samsung, Google"
+                placeholder="Example: Apple,Google"
                 value={query}
                 onChange={(e) => handleInputChange(e.target.value)}
                 onBlur={(e) => setQuery(formatBrandInput(e.target.value))}
@@ -193,13 +188,55 @@ const HomePage = () => {
             </div>
             {showError ? (
               <p className="text-red-600 text-sm mt-2 ml-2 animate-shake">
-                Please enter brand names in the format: Brand1, Brand2, Brand3
+                Please enter at least one brand name.
               </p>
             ) : (
               <p className="text-gray-500 text-sm mt-2 ml-2">
-                Separate brand names with commas (e.g., Apple, Samsung, Google)
+                Separate brand names with commas (e.g., Apple,Samsung,Google)
               </p>
             )}
+          </div>
+
+          {/* Example Data with Copy Icon */}
+          <div className="mt-4">
+            <div className="flex items-center gap-2">
+              <span
+                className="text-indigo-600 cursor-pointer hover:text-indigo-800 transition-colors text-sm underline hover:no-underline"
+                onClick={handleExampleClick}
+              >
+                Google, Apple, Samsung
+              </span>
+              <button
+                onClick={(e) => {
+                  // No need for stopPropagation since buttons are separate
+                  navigator.clipboard.writeText("Google,Apple,Samsung");
+                  // Add visual feedback
+                  e.target.classList.add("example-copied");
+                  setTimeout(() => {
+                    e.target.classList.remove("example-copied");
+                  }, 1000);
+                }}
+                className="text-gray-400 hover:text-purple-600 transition-colors relative"
+                title="Copy example brands"
+              >
+                <svg
+                  className="w-4 h-4 transition-all"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.8}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              </button>
+            </div>
+            <p className="text-gray-400 text-xs mt-1 ml-0.5">
+              Click text to autofill or icon to copy
+            </p>
           </div>
 
           {/* Search Preview */}

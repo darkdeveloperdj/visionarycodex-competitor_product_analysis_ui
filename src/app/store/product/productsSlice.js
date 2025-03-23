@@ -5,10 +5,11 @@ const productsSlice = createSlice({
   initialState: {
     selectedProducts: [],
     allProducts: [],
-    productName: "", // new: stores product_name (category)
-    companyNamesInput: "", // new: stores company_names_input
+    productName: "", // stores product_name (category)
+    companyNamesInput: "", // stores company_names_input
     loading: false,
     error: null,
+    matrixData: [],
   },
   reducers: {
     setSelectedProducts: (state, action) => {
@@ -35,6 +36,19 @@ const productsSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    // New reducers for sending selected products
+    sendSelectedProductsRequest: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    sendSelectedProductsSuccess: (state, action) => {
+      state.loading = false;
+      state.matrixData = action.payload;
+    },
+    sendSelectedProductsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -46,6 +60,9 @@ export const {
   fetchProductsRequest,
   fetchProductsSuccess,
   fetchProductsFailure,
+  sendSelectedProductsRequest,
+  sendSelectedProductsSuccess,
+  sendSelectedProductsFailure,
 } = productsSlice.actions;
 
 export default productsSlice.reducer;

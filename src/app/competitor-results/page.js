@@ -10,7 +10,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { setSelectedProducts } from "../store/product/productsSlice";
+import {
+  setSelectedProducts,
+  sendSelectedProductsRequest,
+} from "../store/product/productsSlice";
 import Lottie from "lottie-react";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/SearchPage.css";
@@ -83,9 +86,27 @@ const SearchPage = () => {
   const [activeFilters, setActiveFilters] = useState(new Set());
   const [mounted, setMounted] = useState(false);
 
+  // Inside the SearchPage component
+  const { matrixData } = useSelector((state) => state.products);
+  const [iframeKey, setIframeKey] = useState(0);
+
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    // Extract only the model values from selectedProducts.
+    const selectedModels = selectedProducts.map((product) => product.model);
+    dispatch(sendSelectedProductsRequest({ selectedProducts: selectedModels }));
+  }, [dispatch, selectedProducts]);
+
+  // Add this effect to refresh iframe when matrixData changes
+  useEffect(() => {
+    if (matrixData?.message === "Products updated successfully") {
+      // Force iframe remount by changing key
+      setIframeKey((prev) => prev + 1);
+    }
+  }, [matrixData?.message]);
 
   // Filter products by category from Redux
   const filteredProducts = useMemo(
@@ -403,6 +424,26 @@ const SearchPage = () => {
                   </div>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Looker Studio Report */}
+          <div className="mb-12 animate-fadeInUp delay-300">
+            <h3 className="text-2xl font-bold mb-6 text-gray-700">
+              📊 Data Report
+            </h3>
+            <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
+              <iframe
+                key={iframeKey}
+                width="600"
+                height="450"
+                className="w-full h-[450px] md:h-[600px] object-cover"
+                src="https://lookerstudio.google.com/embed/reporting/100436a2-d3ff-410d-9318-8696fa4a79a1/page/gxYEF"
+                frameBorder="0"
+                style={{ border: 0 }}
+                allowFullScreen
+                sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+              ></iframe>
             </div>
           </div>
 
