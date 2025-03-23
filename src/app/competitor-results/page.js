@@ -17,6 +17,7 @@ import {
 import Lottie from "lottie-react";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/SearchPage.css";
+import { myCompanyProducts } from "../demo_data/index";
 
 ChartJS.register(
   CategoryScale,
@@ -48,7 +49,6 @@ const StarRating = ({ rating }) => {
   );
 };
 
-// Utility function to parse strings that aren’t valid JSON.
 const parseInvalidJson = (str) => {
   try {
     const validJson = str
@@ -64,7 +64,6 @@ const parseInvalidJson = (str) => {
 
 const SearchPage = () => {
   const dispatch = useDispatch();
-  // Read search parameters from Redux state
   const {
     productName,
     companyNamesInput,
@@ -72,78 +71,82 @@ const SearchPage = () => {
     selectedProducts,
   } = useSelector((state) => state.products);
 
-  // Use Redux values; fallback values provided if undefined.
+  const [selectedCompanyProducts, setSelectedCompanyProducts] = useState([]);
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
+  const [activeFilters, setActiveFilters] = useState(new Set());
+  const [mounted, setMounted] = useState(false);
+  const { matrixData } = useSelector((state) => state.products);
+  const [iframeKey, setIframeKey] = useState(0);
+  const hasSentRequest = useRef(false);
+
   const query = productName || "Products";
-  // Convert productName to lowercase for filtering (adjust as needed)
   const category = productName ? productName.toLowerCase() : "electronics";
-  // Convert the company names input into an array
   const brandList = companyNamesInput
     ? companyNamesInput.split(",").map((brand) => brand.trim())
     : [];
 
-  const [selectedFeatures, setSelectedFeatures] = useState([]);
-  // activeFilters holds a set of product models that are currently active in filtering.
-  const [activeFilters, setActiveFilters] = useState(new Set());
-  const [mounted, setMounted] = useState(false);
-
-  // Inside the SearchPage component
-  const { matrixData } = useSelector((state) => state.products);
-  const [iframeKey, setIframeKey] = useState(0);
-
-  const hasSentRequest = useRef(false);
+  const allSelectedProducts = useMemo(
+    () => [...selectedProducts, ...selectedCompanyProducts],
+    [selectedProducts, selectedCompanyProducts]
+  );
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!hasSentRequest.current) {
-      const selectedModels = selectedProducts.map((product) => product.model);
+    const allModels = allSelectedProducts.map((product) => product.model);
+    setActiveFilters(new Set(allModels));
+  }, [allSelectedProducts]);
+
+  useEffect(() => {
+    if (!hasSentRequest.current && allSelectedProducts.length > 0) {
+      const selectedModels = allSelectedProducts.map(
+        (product) => product.model
+      );
       dispatch(
         sendSelectedProductsRequest({ selectedProducts: selectedModels })
       );
       hasSentRequest.current = true;
     }
-  }, [dispatch, selectedProducts]);
-  // Add this effect to refresh iframe when matrixData changes
+  }, [dispatch, allSelectedProducts]);
+
   useEffect(() => {
     if (matrixData?.message === "Products updated successfully") {
-      // Force iframe remount by changing key
       setIframeKey((prev) => prev + 1);
     }
   }, [matrixData?.message]);
 
-  // Filter products by category from Redux
   const filteredProducts = useMemo(
     () => apiProducts.filter((product) => product.category === category),
     [apiProducts, category]
   );
 
-  // Determine available features from filtered products.
-  const allFeatures = useMemo(
-    () => [
-      ...new Set(
-        filteredProducts.flatMap((product) =>
-          Object.keys(parseInvalidJson(product.features))
-        )
-      ),
-    ],
-    [filteredProducts]
-  );
+  const allFeatures = useMemo(() => {
+    const featuresSet = new Set();
 
-  // Whenever selectedProducts change, reset activeFilters to include all selected products.
-  useEffect(() => {
-    setActiveFilters(new Set(selectedProducts.map((product) => product.model)));
-  }, [selectedProducts]);
+    // Add features from API products
+    filteredProducts.forEach((product) => {
+      const features = parseInvalidJson(product.features);
+      Object.keys(features).forEach((f) => featuresSet.add(f));
+    });
+
+    // Add features from company products
+    myCompanyProducts.flat().forEach((product) => {
+      const features = parseInvalidJson(product.features);
+      Object.keys(features).forEach((f) => featuresSet.add(f));
+    });
+
+    return Array.from(featuresSet);
+  }, [filteredProducts]);
 
   const toggleActiveFilter = (product) => {
+    if (product.brand === "TechNova") return;
     setActiveFilters((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(product.model)) {
-        newSet.delete(product.model);
-      } else {
-        newSet.add(product.model);
-      }
+      newSet.has(product.model)
+        ? newSet.delete(product.model)
+        : newSet.add(product.model);
       return newSet;
     });
   };
@@ -156,31 +159,34 @@ const SearchPage = () => {
     );
   };
 
-  // Reset feature selections and active filters (keeping selected products intact)
   const handleResetFilters = () => {
     setSelectedFeatures([]);
-    setActiveFilters(new Set(selectedProducts.map((p) => p.model)));
+    setActiveFilters(new Set(allSelectedProducts.map((p) => p.model)));
   };
 
-  // Only active products are shown in the comparison table.
+  const handleCompanyProductToggle = (product) => {
+    setSelectedCompanyProducts((prev) =>
+      prev.some((p) => p.model === product.model)
+        ? prev.filter((p) => p.model !== product.model)
+        : [...prev, product]
+    );
+  };
+
   const activeSelectedProducts = useMemo(
     () =>
-      selectedProducts.filter((product) => activeFilters.has(product.model)),
-    [selectedProducts, activeFilters]
+      allSelectedProducts.filter((product) => activeFilters.has(product.model)),
+    [allSelectedProducts, activeFilters]
   );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-800 p-8 flex flex-col font-sans relative overflow-hidden">
-      {/* Sparkles Background Animation */}
       <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
         <Lottie
           animationData={sparklesAnimation}
           loop={true}
           autoplay={true}
           className="w-full h-full"
-          rendererSettings={{
-            preserveAspectRatio: "xMidYMid slice",
-          }}
+          rendererSettings={{ preserveAspectRatio: "xMidYMid slice" }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-purple-100/30" />
       </div>
@@ -190,16 +196,43 @@ const SearchPage = () => {
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
       >
-        {/* Sidebar Filters */}
+        {/* Filter Panel */}
         <div className="w-80 p-6 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200 animate-fadeInLeft">
           <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
             🔍 Comparison Filters
           </h2>
 
-          {/* Selected Products Section */}
+          {/* Company Products Filter */}
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-gray-700">
-              Selected Products
+              🏢 My Products
+            </h3>
+            <div className="space-y-2">
+              {myCompanyProducts.flat().map((product) => (
+                <label
+                  key={product.model}
+                  className="flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 hover:bg-gray-50 border border-gray-200"
+                >
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-4 w-4 text-purple-500"
+                    checked={selectedCompanyProducts.some(
+                      (p) => p.model === product.model
+                    )}
+                    onChange={() => handleCompanyProductToggle(product)}
+                  />
+                  <span className="ml-3 text-sm text-gray-700">
+                    {product.model}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Selected Products Filter */}
+          <div className="mb-8">
+            <h3 className="font-semibold mb-4 text-lg text-gray-700">
+              📦 Selected Products
             </h3>
             <div className="space-y-2">
               {selectedProducts.map((product) => (
@@ -212,6 +245,7 @@ const SearchPage = () => {
                     className="form-checkbox h-4 w-4 text-purple-500"
                     checked={activeFilters.has(product.model)}
                     onChange={() => toggleActiveFilter(product)}
+                    disabled={product.brand === "TechNova"}
                   />
                   <span className="ml-3 text-sm text-gray-700">
                     {product.model}
@@ -221,10 +255,10 @@ const SearchPage = () => {
             </div>
           </div>
 
-          {/* Feature Selection Section */}
+          {/* Feature Filter */}
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-gray-700">
-              Feature Selection
+              ⚙️ Features
             </h3>
             <div className="space-y-2">
               {allFeatures.map((feature) => (
@@ -232,13 +266,13 @@ const SearchPage = () => {
                   key={feature}
                   className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
                     selectedFeatures.includes(feature)
-                      ? "bg-purple-100 border border-purple-300 shadow-md scale-[1.02]"
-                      : "hover:bg-gray-50 border border-gray-200 hover:scale-[1.01]"
-                  }`}
+                      ? "bg-purple-100 border-purple-300 shadow-md scale-[1.02]"
+                      : "hover:bg-gray-50 border-gray-200 hover:scale-[1.01]"
+                  } border`}
                 >
                   <input
                     type="checkbox"
-                    className="form-checkbox h-4 w-4 text-purple-500 transition duration-150 ease-in-out"
+                    className="form-checkbox h-4 w-4 text-purple-500"
                     checked={selectedFeatures.includes(feature)}
                     onChange={() => toggleFeatureSelection(feature)}
                   />
@@ -250,14 +284,12 @@ const SearchPage = () => {
             </div>
           </div>
 
-          <div className="mt-8">
-            <button
-              onClick={handleResetFilters}
-              className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              🔄 Reset All Filters
-            </button>
-          </div>
+          <button
+            onClick={handleResetFilters}
+            className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
+          >
+            🔄 Reset Filters
+          </button>
         </div>
 
         {/* Main Content */}
@@ -267,7 +299,7 @@ const SearchPage = () => {
             Analysis
           </h2>
 
-          {/* Product Comparison Table */}
+          {/* Feature Comparison Table */}
           <div className="mb-12 animate-fadeInUp delay-100">
             <h3 className="text-2xl font-bold mb-6 text-gray-700">
               📜 Feature Comparison Matrix
@@ -300,12 +332,17 @@ const SearchPage = () => {
                         key={index}
                         className={`${
                           index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                        } last:rounded-b-2xl transition-all duration-200 hover:bg-gray-100`}
+                        } hover:bg-gray-100 transition-colors`}
                       >
-                        <td className="p-4 text-sm font-medium">
-                          <span className="flex items-center text-gray-700">
+                        <td className="p-4 text-sm font-medium text-gray-700">
+                          <div className="flex items-center gap-2">
                             {product.brand}
-                          </span>
+                            {product.brand === "TechNova" && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                Our Product
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="p-4 text-sm text-gray-600">
                           {product.model}
@@ -315,11 +352,7 @@ const SearchPage = () => {
                             key={feature}
                             className="p-4 text-center text-2xl"
                           >
-                            {features[feature] ? (
-                              <span className="text-green-600">✅</span>
-                            ) : (
-                              <span className="text-red-600">❌</span>
-                            )}
+                            {features[feature] ? "✅" : "❌"}
                           </td>
                         ))}
                       </tr>
@@ -330,31 +363,26 @@ const SearchPage = () => {
             </div>
           </div>
 
-          {/* Product Insights */}
+          {/* Market Insights */}
           <div className="mb-12 animate-fadeInUp delay-200">
             <h3 className="text-2xl font-bold mb-6 text-gray-700">
               💡 Market Insights
             </h3>
-            <div
-              className={`grid gap-4 ${
-                activeSelectedProducts.length === 1
-                  ? "grid-cols-1"
-                  : activeSelectedProducts.length === 2
-                  ? "grid-cols-2"
-                  : "grid-cols-3"
-              }`}
-            >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {activeSelectedProducts.map((product) => {
                 const insights = parseInvalidJson(product.insights);
                 return (
                   <div
                     key={product.model}
-                    className="bg-white p-6 rounded-xl border border-gray-200 hover:border-purple-300 transition-all duration-300 shadow-sm"
+                    className="bg-white p-6 rounded-xl border border-gray-200 hover:border-purple-300 transition-all"
                   >
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex justify-between items-center mb-4">
                       <h4 className="text-lg font-semibold text-gray-700">
                         {product.model}
                       </h4>
+                      <span className="text-sm text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+                        {product.brand}
+                      </span>
                     </div>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
@@ -363,14 +391,13 @@ const SearchPage = () => {
                         </span>
                         <span
                           className={`text-sm font-medium ${
-                            insights.popularity === "High"
+                            insights.popularity === "High" ||
+                            insights.popularity === "Very High"
                               ? "text-green-600"
                               : "text-red-600"
                           }`}
                         >
-                          {insights.popularity === "High"
-                            ? "📈 High"
-                            : "📉 Low"}
+                          {insights.popularity}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
@@ -384,14 +411,19 @@ const SearchPage = () => {
                               : "text-green-600"
                           }`}
                         >
-                          {insights.priceTrend === "Increasing" ? "📈" : "📉"}{" "}
                           {insights.priceTrend}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">🛒 Demand</span>
-                        <span className="text-sm font-medium text-indigo-600">
-                          {insights.demand === "High" ? "🔥" : "🌱"}{" "}
+                        <span
+                          className={`text-sm font-medium ${
+                            insights.demand === "High" ||
+                            insights.demand === "Extreme"
+                              ? "text-purple-600"
+                              : "text-blue-600"
+                          }`}
+                        >
                           {insights.demand}
                         </span>
                       </div>
@@ -399,7 +431,7 @@ const SearchPage = () => {
                         <span className="text-sm text-gray-600">
                           🏆 Market Share
                         </span>
-                        <span className="text-sm font-medium text-purple-600">
+                        <span className="text-sm font-medium text-indigo-600">
                           {insights.marketShare}
                         </span>
                       </div>
@@ -410,7 +442,7 @@ const SearchPage = () => {
             </div>
           </div>
 
-          {/* Looker Studio Report */}
+          {/* Data Report */}
           <div className="mb-12 animate-fadeInUp delay-300">
             <h3 className="text-2xl font-bold mb-6 text-gray-700">
               📊 Data Report
@@ -418,36 +450,32 @@ const SearchPage = () => {
             <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
               <iframe
                 key={iframeKey}
-                width="600"
-                height="450"
-                className="w-full h-[450px] md:h-[600px] object-cover"
+                className="w-full h-[450px] md:h-[600px]"
                 src="https://lookerstudio.google.com/embed/reporting/100436a2-d3ff-410d-9318-8696fa4a79a1/page/gxYEF"
                 frameBorder="0"
-                style={{ border: 0 }}
                 allowFullScreen
                 sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
               ></iframe>
             </div>
           </div>
 
-          {/* Customer Reviews & Ratings */}
-          <div className="mb-12 animate-fadeInUp delay-500">
+          {/* Customer Reviews */}
+          <div className="animate-fadeInUp delay-500">
             <h3 className="text-2xl font-bold mb-6 text-gray-700">
               😊 Customer Feedback Analysis
             </h3>
             <div className="space-y-6">
               {activeSelectedProducts.map((product) => {
                 const reviews = parseInvalidJson(product.reviews);
-                const avgRating =
-                  Array.isArray(reviews) && reviews.length > 0
-                    ? reviews.reduce((sum, review) => sum + review.rating, 0) /
-                      reviews.length
-                    : 0;
+                const avgRating = reviews?.length
+                  ? reviews.reduce((sum, review) => sum + review.rating, 0) /
+                    reviews.length
+                  : 0;
 
                 return (
                   <div
                     key={product.model}
-                    className="bg-white p-6 rounded-2xl border border-gray-200 hover:scale-[1.005] transition-all duration-300 shadow-sm"
+                    className="bg-white p-6 rounded-2xl border border-gray-200 hover:scale-[1.005] transition-all"
                   >
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                       <h4 className="text-lg font-semibold text-gray-700 mb-2 md:mb-0">
@@ -461,51 +489,41 @@ const SearchPage = () => {
                           </span>
                         </div>
                         <span className="text-sm text-gray-500">
-                          📝 {Array.isArray(reviews) ? reviews.length : 0}{" "}
-                          reviews
+                          📝 {reviews?.length || 0} reviews
                         </span>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Array.isArray(reviews) &&
-                        reviews.map((review, index) => (
-                          <div
-                            key={index}
-                            className="bg-gray-50 p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-all duration-300"
-                          >
-                            <div className="flex justify-between items-start mb-2">
-                              <div>
-                                <h5 className="font-medium text-gray-700">
-                                  👤 {review.user}
-                                </h5>
-                                <p className="text-xs text-gray-500">
-                                  📅{" "}
-                                  {new Date(review.date).toLocaleDateString(
-                                    "en-US",
-                                    {
-                                      year: "numeric",
-                                      month: "short",
-                                      day: "numeric",
-                                    }
-                                  )}
-                                </p>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <StarRating rating={review.rating} />
-                                {review.rating >= 4 ? (
-                                  <span className="text-2xl">😍</span>
-                                ) : review.rating >= 3 ? (
-                                  <span className="text-2xl">😊</span>
-                                ) : (
-                                  <span className="text-2xl">😞</span>
-                                )}
-                              </div>
+                      {reviews?.map((review, index) => (
+                        <div
+                          key={index}
+                          className="bg-gray-50 p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-all"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h5 className="font-medium text-gray-700">
+                                👤 {review.user}
+                              </h5>
+                              <p className="text-xs text-gray-500">
+                                📅 {new Date(review.date).toLocaleDateString()}
+                              </p>
                             </div>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                              💭 {review.comment}
-                            </p>
+                            <div className="flex items-center space-x-2">
+                              <StarRating rating={review.rating} />
+                              <span className="text-2xl">
+                                {review.rating >= 4
+                                  ? "😍"
+                                  : review.rating >= 3
+                                  ? "😊"
+                                  : "😞"}
+                              </span>
+                            </div>
                           </div>
-                        ))}
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            💭 {review.comment}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 );

@@ -142,7 +142,11 @@ const ProductSelection = () => {
             className="w-40 h-40 mx-auto"
           />
           <h1 className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl font-extrabold text-center w-full bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-            {category ? `${category} Products` : "Product Selection"}
+            {category
+              ? `${
+                  category.charAt(0).toUpperCase() + category.slice(1)
+                } Products`
+              : "Product Selection"}
           </h1>
         </div>
 
