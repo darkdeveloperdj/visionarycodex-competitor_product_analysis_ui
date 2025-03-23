@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Chart as ChartJS,
@@ -75,9 +75,9 @@ const SearchPage = () => {
   const [selectedFeatures, setSelectedFeatures] = useState([]);
   const [activeFilters, setActiveFilters] = useState(new Set());
   const [mounted, setMounted] = useState(false);
+  const [lastSentFilters, setLastSentFilters] = useState(null);
   const { matrixData } = useSelector((state) => state.products);
   const [iframeKey, setIframeKey] = useState(0);
-  const hasSentRequest = useRef(false);
 
   const query = productName || "Products";
   const category = productName ? productName.toLowerCase() : "electronics";
@@ -97,19 +97,18 @@ const SearchPage = () => {
   useEffect(() => {
     const allModels = allSelectedProducts.map((product) => product.model);
     setActiveFilters(new Set(allModels));
+    setLastSentFilters(null);
   }, [allSelectedProducts]);
 
   useEffect(() => {
-    if (!hasSentRequest.current && allSelectedProducts.length > 0) {
-      const selectedModels = allSelectedProducts.map(
-        (product) => product.model
-      );
+    const currentFilters = Array.from(activeFilters);
+    if (JSON.stringify(currentFilters) !== JSON.stringify(lastSentFilters)) {
       dispatch(
-        sendSelectedProductsRequest({ selectedProducts: selectedModels })
+        sendSelectedProductsRequest({ selectedProducts: currentFilters })
       );
-      hasSentRequest.current = true;
+      setLastSentFilters(currentFilters);
     }
-  }, [dispatch, allSelectedProducts]);
+  }, [dispatch, activeFilters, lastSentFilters]);
 
   useEffect(() => {
     if (matrixData?.message === "Products updated successfully") {
@@ -125,13 +124,11 @@ const SearchPage = () => {
   const allFeatures = useMemo(() => {
     const featuresSet = new Set();
 
-    // Add features from API products
     filteredProducts.forEach((product) => {
       const features = parseInvalidJson(product.features);
       Object.keys(features).forEach((f) => featuresSet.add(f));
     });
 
-    // Add features from company products
     myCompanyProducts.flat().forEach((product) => {
       const features = parseInvalidJson(product.features);
       Object.keys(features).forEach((f) => featuresSet.add(f));
