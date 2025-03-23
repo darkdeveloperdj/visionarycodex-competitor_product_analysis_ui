@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Chart as ChartJS,
@@ -78,7 +78,6 @@ const SearchPage = () => {
   const [lastSentFilters, setLastSentFilters] = useState(null);
   const { matrixData } = useSelector((state) => state.products);
   const [iframeKey, setIframeKey] = useState(0);
-  const hasInitialized = useRef(false);
 
   const query = productName || "Products";
   const category = productName ? productName.toLowerCase() : "electronics";
@@ -97,27 +96,17 @@ const SearchPage = () => {
 
   useEffect(() => {
     const allModels = allSelectedProducts.map((product) => product.model);
-    const newFilters = new Set(allModels);
-
-    if (
-      JSON.stringify(Array.from(newFilters)) !==
-      JSON.stringify(Array.from(activeFilters))
-    ) {
-      setActiveFilters(newFilters);
-    }
-  }, [allSelectedProducts, activeFilters]);
+    setActiveFilters(new Set(allModels));
+    setLastSentFilters(null);
+  }, [allSelectedProducts]);
 
   useEffect(() => {
     const currentFilters = Array.from(activeFilters);
-
-    if (!hasInitialized.current && currentFilters.length === 0) return;
-
     if (JSON.stringify(currentFilters) !== JSON.stringify(lastSentFilters)) {
       dispatch(
         sendSelectedProductsRequest({ selectedProducts: currentFilters })
       );
       setLastSentFilters(currentFilters);
-      if (!hasInitialized.current) hasInitialized.current = true;
     }
   }, [dispatch, activeFilters, lastSentFilters]);
 
@@ -170,7 +159,7 @@ const SearchPage = () => {
   const handleResetFilters = () => {
     setSelectedFeatures([]);
     setSelectedCompanyProducts([]); // Add this line
-    setActiveFilters(new Set(selectedProducts.map((p) => p.model)));
+    setActiveFilters(new Set(allSelectedProducts.map((p) => p.model)));
   };
 
   const handleCompanyProductToggle = (product) => {
@@ -454,7 +443,7 @@ const SearchPage = () => {
           {/* Data Report */}
           <div className="mb-12 animate-fadeInUp delay-300">
             <h3 className="text-2xl font-bold mb-6 text-gray-700">
-              📊 Data Report
+              📊 Analysis Report
             </h3>
             <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
               <iframe
