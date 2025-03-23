@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Chart as ChartJS,
@@ -90,16 +90,21 @@ const SearchPage = () => {
   const { matrixData } = useSelector((state) => state.products);
   const [iframeKey, setIframeKey] = useState(0);
 
+  const hasSentRequest = useRef(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    // Extract only the model values from selectedProducts.
-    const selectedModels = selectedProducts.map((product) => product.model);
-    dispatch(sendSelectedProductsRequest({ selectedProducts: selectedModels }));
+    if (!hasSentRequest.current) {
+      const selectedModels = selectedProducts.map((product) => product.model);
+      dispatch(
+        sendSelectedProductsRequest({ selectedProducts: selectedModels })
+      );
+      hasSentRequest.current = true;
+    }
   }, [dispatch, selectedProducts]);
-
   // Add this effect to refresh iframe when matrixData changes
   useEffect(() => {
     if (matrixData?.message === "Products updated successfully") {
