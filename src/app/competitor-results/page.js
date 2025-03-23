@@ -445,7 +445,7 @@ const SearchPage = () => {
           {/* Data Report */}
           <div className="mb-12 animate-fadeInUp delay-300">
             <h3 className="text-2xl font-bold mb-6 text-gray-700">
-              📊 Data Report
+              📊 Analysis Report
             </h3>
             <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
               <iframe
