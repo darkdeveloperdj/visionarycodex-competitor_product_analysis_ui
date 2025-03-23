@@ -169,7 +169,8 @@ const SearchPage = () => {
 
   const handleResetFilters = () => {
     setSelectedFeatures([]);
-    setActiveFilters(new Set(allSelectedProducts.map((p) => p.model)));
+    setSelectedCompanyProducts([]); // Add this line
+    setActiveFilters(new Set(selectedProducts.map((p) => p.model)));
   };
 
   const handleCompanyProductToggle = (product) => {
