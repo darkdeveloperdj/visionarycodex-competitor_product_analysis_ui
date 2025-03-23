@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,11 +14,9 @@ import checkmarkAnimation from "../../../public/assets/animations/checkmark.json
 import sparkleAnimation from "../../../public/assets/animations/sparkle.json";
 import "../../../public/assets/css/CompetitorSelection.css";
 
-// Simple parsers for features and insights
 const parseFeatures = (featuresStr) => {
   try {
-    const jsonStr = featuresStr.replace(/'/g, '"');
-    return JSON.parse(jsonStr);
+    return JSON.parse(featuresStr.replace(/'/g, '"'));
   } catch (error) {
     return {};
   }
@@ -26,8 +24,7 @@ const parseFeatures = (featuresStr) => {
 
 const parseInsights = (insightsStr) => {
   try {
-    const jsonStr = insightsStr.replace(/'/g, '"');
-    return JSON.parse(jsonStr);
+    return JSON.parse(insightsStr.replace(/'/g, '"'));
   } catch (error) {
     return {};
   }
@@ -36,7 +33,6 @@ const parseInsights = (insightsStr) => {
 const ProductSelection = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  // Read search parameters from Redux state instead of URL searchParams.
   const {
     productName,
     companyNamesInput,
@@ -44,45 +40,57 @@ const ProductSelection = () => {
     loading,
   } = useSelector((state) => state.products);
 
-  // Use productName (converted to lowercase) as the category.
-  const category = productName ? productName.toLowerCase() : "";
-
   const [mounted, setMounted] = useState(false);
   const [localSelected, setLocalSelected] = useState([]);
+  const hasFetched = useRef(false);
+  const category = productName?.toLowerCase() || "";
+  const brands = useMemo(
+    () =>
+      companyNamesInput
+        ? companyNamesInput.split(",").map((b) => b.trim())
+        : [],
+    [companyNamesInput]
+  );
 
-  // Flatten products and add unique IDs
   const flattenedProducts = useMemo(
     () =>
-      apiProducts.flat().map((product, index) => ({
-        ...product,
-        uniqueId: `${product.brand}-${product.model}-${index}`,
+      apiProducts.flat().map((p, i) => ({
+        ...p,
+        uniqueId: `${p.brand}-${p.model}-${i}`,
       })),
     [apiProducts]
   );
-  // Parse brands from companyNamesInput from Redux.
-  const brands = companyNamesInput
-    ? companyNamesInput.split(",").map((brand) => brand.trim())
-    : [];
 
   useEffect(() => {
+    let isMounted = true;
     setMounted(true);
-    // Dispatch fetchProductsRequest using category and companyNamesInput from Redux.
-    dispatch(fetchProductsRequest({ category, companyNamesInput }));
+
+    if (!hasFetched.current && isMounted) {
+      dispatch(fetchProductsRequest({ category, companyNamesInput }));
+      hasFetched.current = true;
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [dispatch, category, companyNamesInput]);
 
   useEffect(() => {
-    // Compare lengths as a simple check (you can enhance this logic if needed)
     if (flattenedProducts.length !== apiProducts.length) {
       dispatch(setAllProducts(flattenedProducts));
     }
   }, [flattenedProducts, apiProducts.length, dispatch]);
 
-  const groupedByBrand = flattenedProducts.reduce((acc, product) => {
-    const brand = product.brand;
-    acc[brand] = acc[brand] || [];
-    acc[brand].push(product);
-    return acc;
-  }, {});
+  const groupedByBrand = useMemo(
+    () =>
+      flattenedProducts.reduce((acc, product) => {
+        const brand = product.brand;
+        acc[brand] = acc[brand] || [];
+        acc[brand].push(product);
+        return acc;
+      }, {}),
+    [flattenedProducts]
+  );
 
   const toggleProduct = (product) => {
     setLocalSelected((prev) =>
@@ -93,18 +101,11 @@ const ProductSelection = () => {
   };
 
   const handleProceed = () => {
-    if (localSelected.length === 0) return;
-
-    // Get selected product objects based on localSelected IDs.
-    const selectedProductsData = flattenedProducts.filter((product) =>
-      localSelected.includes(product.uniqueId)
+    if (!localSelected.length) return;
+    const selected = flattenedProducts.filter((p) =>
+      localSelected.includes(p.uniqueId)
     );
-
-    // Update Redux store with the selected products.
-    dispatch(setSelectedProducts(selectedProductsData));
-    dispatch(setAllProducts(flattenedProducts));
-
-    // Navigate to competitor results using stored values from Redux.
+    dispatch(setSelectedProducts(selected));
     router.push(`/competitor-results`);
   };
 
@@ -255,9 +256,9 @@ const ProductSelection = () => {
         <div className="mt-8 animate-fadeInUp">
           <button
             onClick={handleProceed}
-            disabled={localSelected.length === 0}
+            disabled={!localSelected.length}
             className={`w-full px-8 py-4 text-lg font-semibold text-white rounded-xl shadow-lg transition-all duration-300 ${
-              localSelected.length > 0
+              localSelected.length
                 ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-md hover:scale-[1.02]"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
