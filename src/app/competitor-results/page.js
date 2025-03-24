@@ -17,7 +17,7 @@ import {
 import Lottie from "lottie-react";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/SearchPage.css";
-import { myCompanyProducts } from "../demo_data/index";
+// import { myCompanyProducts } from "../demo_data/index";
 
 ChartJS.register(
   CategoryScale,
@@ -69,6 +69,7 @@ const SearchPage = () => {
     productName,
     companyNamesInput,
     allProducts: apiProducts,
+    myCompanyAllProducts: myCompanyProducts,
     selectedProducts,
   } = useSelector((state) => state.products);
 

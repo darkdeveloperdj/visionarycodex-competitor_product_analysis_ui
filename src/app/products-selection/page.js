@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProductsRequest,
+  fetchMyCompanyProductsRequest,
   setSelectedProducts,
   setAllProducts,
 } from "../store/product/productsSlice";
@@ -66,7 +67,15 @@ const ProductSelection = () => {
     setMounted(true);
 
     if (!hasFetched.current && isMounted) {
+      // Dispatch the products request
       dispatch(fetchProductsRequest({ category, companyNamesInput }));
+      // Dispatch the myCompanyProducts request with company "TechNova"
+      dispatch(
+        fetchMyCompanyProductsRequest({
+          category,
+          companyNamesInput: "TechNova",
+        })
+      );
       hasFetched.current = true;
     }
 

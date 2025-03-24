@@ -7,6 +7,9 @@ import {
   sendSelectedProductsRequest,
   sendSelectedProductsSuccess,
   sendSelectedProductsFailure,
+  fetchMyCompanyProductsRequest,
+  fetchMyCompanyProductsSuccess,
+  fetchMyCompanyProductsFailure,
 } from "./productsSlice";
 
 // Saga to fetch products with parameters
@@ -43,6 +46,22 @@ function* sendSelectedProductsSaga(action) {
   }
 }
 
+// Saga to fetch products with parameters
+function* fetchMyCompanyProductsSaga(action) {
+  try {
+    const { category, companyNamesInput } = action.payload;
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/fetch/?product_name=${category}&company_names_input=${companyNamesInput}`;
+    const response = yield call(axios.get, apiUrl);
+    yield put(fetchMyCompanyProductsSuccess(response.data));
+  } catch (error) {
+    yield put(
+      fetchMyCompanyProductsFailure(
+        error.response?.data?.message || "Failed to fetch products"
+      )
+    );
+  }
+}
+
 // Watcher sagas
 function* watchFetchProducts() {
   yield takeEvery(fetchProductsRequest.type, fetchProductsSaga);
@@ -52,7 +71,18 @@ function* watchSendSelectedProducts() {
   yield takeEvery(sendSelectedProductsRequest.type, sendSelectedProductsSaga);
 }
 
+function* watchMyCompanyFetchProducts() {
+  yield takeEvery(
+    fetchMyCompanyProductsRequest.type,
+    fetchMyCompanyProductsSaga
+  );
+}
+
 // Root saga
 export default function* productsSaga() {
-  yield all([watchFetchProducts(), watchSendSelectedProducts()]);
+  yield all([
+    watchFetchProducts(),
+    watchSendSelectedProducts(),
+    watchMyCompanyFetchProducts(),
+  ]);
 }

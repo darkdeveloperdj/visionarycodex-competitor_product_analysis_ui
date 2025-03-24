@@ -10,6 +10,7 @@ const productsSlice = createSlice({
     loading: false,
     error: null,
     matrixData: [],
+    myCompanyAllProducts: [],
   },
   reducers: {
     setSelectedProducts: (state, action) => {
@@ -49,6 +50,19 @@ const productsSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+
+    fetchMyCompanyProductsRequest: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchMyCompanyProductsSuccess: (state, action) => {
+      state.loading = false;
+      state.myCompanyAllProducts = action.payload;
+    },
+    fetchMyCompanyProductsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -63,6 +77,10 @@ export const {
   sendSelectedProductsRequest,
   sendSelectedProductsSuccess,
   sendSelectedProductsFailure,
+
+  fetchMyCompanyProductsRequest,
+  fetchMyCompanyProductsSuccess,
+  fetchMyCompanyProductsFailure,
 } = productsSlice.actions;
 
 export default productsSlice.reducer;
