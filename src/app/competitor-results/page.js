@@ -96,11 +96,13 @@ const SearchPage = () => {
     setMounted(true);
   }, []);
 
+  // Initialize active filters on mount
   useEffect(() => {
-    const allModels = allSelectedProducts.map((product) => product.model);
-    setActiveFilters(new Set(allModels));
-    setLastSentFilters(null);
-  }, [allSelectedProducts]);
+    const initialModels = [...selectedProducts, ...selectedCompanyProducts].map(
+      (product) => product.model
+    );
+    setActiveFilters(new Set(initialModels));
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   useEffect(() => {
     const currentFilters = Array.from(activeFilters);
@@ -164,12 +166,22 @@ const SearchPage = () => {
     setActiveFilters(new Set(allSelectedProducts.map((p) => p.model)));
   };
 
+  // Update handleCompanyProductToggle to manage activeFilters
   const handleCompanyProductToggle = (product) => {
-    setSelectedCompanyProducts((prev) =>
-      prev.some((p) => p.model === product.model)
+    setSelectedCompanyProducts((prev) => {
+      const newSelected = prev.some((p) => p.model === product.model)
         ? prev.filter((p) => p.model !== product.model)
-        : [...prev, product]
-    );
+        : [...prev, product];
+      // Sync active filters
+      setActiveFilters((prevFilters) => {
+        const newFilters = new Set(prevFilters);
+        newSelected.some((p) => p.model === product.model)
+          ? newFilters.add(product.model)
+          : newFilters.delete(product.model);
+        return newFilters;
+      });
+      return newSelected;
+    });
   };
 
   const activeSelectedProducts = useMemo(
