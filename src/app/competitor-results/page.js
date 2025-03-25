@@ -456,6 +456,7 @@ const CompetitorResults = () => {
     brandName,
     selectedCompetitorBrands,
     competitorProducts,
+    loading,
   } = useSelector((state) => state.products);
 
   const myProducts = useMemo(
@@ -545,6 +546,26 @@ const CompetitorResults = () => {
       competitorProducts.filter((product) => activeFilters.has(product.model)),
     [competitorProducts, activeFilters]
   );
+
+  if (loading && competitorProducts.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50 relative">
+        <div className="absolute inset-0 bg-white opacity-60"></div>
+        <div className="z-10 flex flex-col items-center">
+          <Lottie
+            animationData={sparklesAnimation}
+            loop
+            autoplay
+            className="w-32 h-32"
+            rendererSettings={{ preserveAspectRatio: "xMidYMid slice" }}
+          />
+          <p className="text-2xl font-bold text-gray-800 mt-4 text-center">
+            Analysis ongoing, fetching competitor details...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-50 text-gray-800 p-8 flex flex-col font-sans relative overflow-hidden">
