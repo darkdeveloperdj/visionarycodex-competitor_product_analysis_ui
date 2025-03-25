@@ -3,63 +3,90 @@ import { createSlice } from "@reduxjs/toolkit";
 const productsSlice = createSlice({
   name: "products",
   initialState: {
-    selectedProducts: [],
-    allProducts: [],
-    productName: "", // stores product_name (category)
-    companyNamesInput: "", // stores company_names_input
     loading: false,
     error: null,
-    matrixData: [],
-    myCompanyAllProducts: [],
+    categoryName: "",
+    brandName: "",
+    competitorBrands: [],
+    competitorProducts: [],
+    competitorProductsDetails: [],
+    selectedProducts: [],
+    categoryList: [],
   },
   reducers: {
-    setSelectedProducts: (state, action) => {
-      state.selectedProducts = action.payload;
+    setCategoryName: (state, action) => {
+      state.categoryName = action.payload;
     },
-    setAllProducts: (state, action) => {
-      state.allProducts = action.payload;
+    setBrandName: (state, action) => {
+      state.brandName = action.payload;
     },
-    setProductName: (state, action) => {
-      state.productName = action.payload;
-    },
-    setCompanyNamesInput: (state, action) => {
-      state.companyNamesInput = action.payload;
-    },
-    fetchProductsRequest: (state) => {
+
+    // Competitor Brands
+    fetchCompetitorBrandsRequest: (state) => {
       state.loading = true;
       state.error = null;
     },
-    fetchProductsSuccess: (state, action) => {
+    fetchCompetitorBrandsSuccess: (state, action) => {
       state.loading = false;
-      state.allProducts = action.payload;
+      state.competitorBrands = action.payload;
     },
-    fetchProductsFailure: (state, action) => {
+    fetchCompetitorBrandsFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
-    // New reducers for sending selected products
+
+    // Competitor Products (Basic List)
+    fetchCompetitorProductsRequest: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchCompetitorProductsSuccess: (state, action) => {
+      state.loading = false;
+      state.competitorProducts = action.payload;
+    },
+    fetchCompetitorProductsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    // Competitor Products Details
+    fetchCompetitorProductsDetailsRequest: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchCompetitorProductsDetailsSuccess: (state, action) => {
+      state.loading = false;
+      state.competitorProductsDetails = action.payload;
+    },
+    fetchCompetitorProductsDetailsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    // Selected Products Submission
     sendSelectedProductsRequest: (state) => {
       state.loading = true;
       state.error = null;
     },
     sendSelectedProductsSuccess: (state, action) => {
       state.loading = false;
-      state.matrixData = action.payload;
+      state.selectedProducts = action.payload;
     },
     sendSelectedProductsFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
 
-    fetchMyCompanyProductsRequest: (state) => {
+    // Category List fetch
+    fetchCategoryListRequest: (state) => {
       state.loading = true;
       state.error = null;
     },
-    fetchMyCompanyProductsSuccess: (state, action) => {
+    fetchCategoryListSuccess: (state, action) => {
       state.loading = false;
-      state.myCompanyAllProducts = action.payload;
+      state.categoryList = action.payload;
     },
-    fetchMyCompanyProductsFailure: (state, action) => {
+    fetchCategoryListFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
@@ -67,20 +94,23 @@ const productsSlice = createSlice({
 });
 
 export const {
-  setSelectedProducts,
-  setAllProducts,
-  setProductName,
-  setCompanyNamesInput,
-  fetchProductsRequest,
-  fetchProductsSuccess,
-  fetchProductsFailure,
+  setCategoryName,
+  setBrandName,
+  fetchCompetitorBrandsRequest,
+  fetchCompetitorBrandsSuccess,
+  fetchCompetitorBrandsFailure,
+  fetchCompetitorProductsRequest,
+  fetchCompetitorProductsSuccess,
+  fetchCompetitorProductsFailure,
+  fetchCompetitorProductsDetailsRequest,
+  fetchCompetitorProductsDetailsSuccess,
+  fetchCompetitorProductsDetailsFailure,
   sendSelectedProductsRequest,
   sendSelectedProductsSuccess,
   sendSelectedProductsFailure,
-
-  fetchMyCompanyProductsRequest,
-  fetchMyCompanyProductsSuccess,
-  fetchMyCompanyProductsFailure,
+  fetchCategoryListRequest,
+  fetchCategoryListSuccess,
+  fetchCategoryListFailure,
 } = productsSlice.actions;
 
 export default productsSlice.reducer;

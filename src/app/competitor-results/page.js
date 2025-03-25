@@ -66,8 +66,8 @@ const parseInvalidJson = (str) => {
 const SearchPage = () => {
   const dispatch = useDispatch();
   const {
-    productName,
-    companyNamesInput,
+    categoryName,
+    brandName,
     allProducts: apiProducts,
     myCompanyAllProducts: myCompanyProducts,
     selectedProducts,
@@ -81,10 +81,10 @@ const SearchPage = () => {
   const { matrixData } = useSelector((state) => state.products);
   const [iframeKey, setIframeKey] = useState(0);
 
-  const query = productName || "Products";
-  const category = productName ? productName.toLowerCase() : "electronics";
-  const brandList = companyNamesInput
-    ? companyNamesInput.split(",").map((brand) => brand.trim())
+  const query = categoryName || "Products";
+  const category = categoryName ? categoryName.toLowerCase() : "electronics";
+  const brandList = brandName
+    ? brandName.split(",").map((brand) => brand.trim())
     : [];
 
   const allSelectedProducts = useMemo(

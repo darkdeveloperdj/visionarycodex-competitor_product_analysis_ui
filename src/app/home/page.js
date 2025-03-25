@@ -1,16 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { category } from "../demo_data";
+import { category } from "../utils/dummyData";
 import Lottie from "lottie-react";
 import analyticsAnimation from "../../../public/assets/animations/analytics-animation.json";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/HomePage.css";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  setProductName,
-  setCompanyNamesInput,
-} from "../store/product/productsSlice";
+import { useDispatch } from "react-redux";
+import { setCategoryName, setBrandName } from "../store/product/productsSlice";
 
 const categoryLabels = {
   electronics: "Electronics",
@@ -23,60 +20,49 @@ const categoryLabels = {
 const HomePage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const { productName, companyNamesInput } = useSelector(
-    (state) => state.products
-  );
+
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(category[0]);
   const [showError, setShowError] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showCopiedFeedback, setShowCopiedFeedback] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Format input: trim, remove extra commas, and capitalize the first letter of each word.
-  const formatBrandInput = (input) => {
+  const formatCompanyInput = (input) => {
     return input
-      .split(",")
-      .map((brand) => {
-        const trimmed = brand.trim();
-        if (!trimmed) return "";
-        return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
-      })
-      .filter((brand) => brand !== "")
-      .join(", ");
+      .trim()
+      .split(/\s+/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
   };
 
   const handleInputChange = (value) => {
-    // Replace multiple commas with a single comma and ensure spacing consistency.
-    const formatted = value.replace(/,+/g, ",").replace(/,\s*/g, ", ");
-    setQuery(formatted);
+    setQuery(value);
     setShowError(false);
   };
 
   const handleExampleClick = () => {
-    const example = "Google,Apple,Samsung";
+    const example = "Apple";
     setQuery(example);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formattedQuery = formatBrandInput(query);
+    const formattedQuery = formatCompanyInput(query);
     if (!formattedQuery) {
       setShowError(true);
       return;
     }
-    // Save search parameters in Redux with formatted data.
-    dispatch(setProductName(selectedCategory));
-    dispatch(setCompanyNamesInput(formattedQuery));
-    // Navigate using the submitted values.
-    router.push(`/products-selection`);
+    dispatch(setCategoryName(selectedCategory));
+    dispatch(setBrandName(formattedQuery));
+    router.push(`/competitor-brands-selection`);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center p-4 font-sans relative overflow-hidden">
-      {/* Sparkles Background */}
       <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
         <Lottie
           animationData={sparklesAnimation}
@@ -90,13 +76,11 @@ const HomePage = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-purple-100/30" />
       </div>
 
-      {/* Main Content */}
       <div
         className={`w-full max-w-2xl p-8 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 transform transition-all duration-1000 relative z-10 ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
       >
-        {/* Header Animation */}
         <div className="relative h-48 mb-8 -mt-12">
           <Lottie
             animationData={analyticsAnimation}
@@ -115,13 +99,13 @@ const HomePage = () => {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Category Selector */}
           <div className="animate-fadeInUp delay-100 relative group">
             <label className="block text-gray-700 text-sm font-medium mb-3">
               Product Category
             </label>
             <div className="relative">
               <select
+                name="category_name"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full p-4 pl-6 pr-10 text-gray-700 bg-white/95 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none transition-all duration-300 hover:border-purple-400 hover:shadow-md"
@@ -155,18 +139,18 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Search Input */}
           <div className="animate-fadeInUp delay-200">
             <label className="block text-gray-700 text-sm font-medium mb-3">
-              Choose Brands
+              Enter Your Brand
             </label>
             <div className="relative group">
               <input
+                name="brand_name"
                 type="text"
-                placeholder="Example: Apple,Google"
+                placeholder="Example: Apple"
                 value={query}
                 onChange={(e) => handleInputChange(e.target.value)}
-                onBlur={(e) => setQuery(formatBrandInput(e.target.value))}
+                onBlur={(e) => setQuery(formatCompanyInput(e.target.value))}
                 className="w-full p-4 pl-12 pr-6 text-gray-700 bg-white/95 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 hover:border-purple-400 hover:shadow-md"
                 required
               />
@@ -188,36 +172,38 @@ const HomePage = () => {
             </div>
             {showError ? (
               <p className="text-red-600 text-sm mt-2 ml-2 animate-shake">
-                Please enter at least one brand name.
+                Please enter your brand name.
               </p>
             ) : (
               <p className="text-gray-500 text-sm mt-2 ml-2">
-                Separate brand names with commas (e.g., Apple,Samsung,Google)
+                Enter your brand name
               </p>
             )}
           </div>
 
-          {/* Example Data with Copy Icon */}
-          <div className="mt-4">
+          <div className="mt-4 relative">
             <div className="flex items-center gap-2">
               <span
                 className="text-indigo-600 cursor-pointer hover:text-indigo-800 transition-colors text-sm underline hover:no-underline"
                 onClick={handleExampleClick}
               >
-                Google, Apple, Samsung
+                Apple
               </span>
               <button
+                type="button"
                 onClick={(e) => {
-                  // No need for stopPropagation since buttons are separate
-                  navigator.clipboard.writeText("Google,Apple,Samsung");
-                  // Add visual feedback
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigator.clipboard.writeText("Apple");
                   e.target.classList.add("example-copied");
+                  setShowCopiedFeedback(true);
                   setTimeout(() => {
+                    setShowCopiedFeedback(false);
                     e.target.classList.remove("example-copied");
-                  }, 1000);
+                  }, 1500);
                 }}
                 className="text-gray-400 hover:text-purple-600 transition-colors relative"
-                title="Copy example brands"
+                title="Copy example brand"
               >
                 <svg
                   className="w-4 h-4 transition-all"
@@ -234,12 +220,35 @@ const HomePage = () => {
                 </svg>
               </button>
             </div>
+
+            <div
+              className={`absolute left-full ml-2 top-1/2 -translate-y-1/2 transition-opacity duration-300 ${
+                showCopiedFeedback ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div className="bg-purple-600 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1">
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Copied!
+              </div>
+            </div>
+
             <p className="text-gray-400 text-xs mt-1 ml-0.5">
               Click text to autofill or icon to copy
             </p>
           </div>
 
-          {/* Search Preview */}
           {query && (
             <div className="animate-fadeInUp text-center p-4 bg-purple-50 rounded-lg border border-purple-200 hover:scale-[1.01] transition-transform duration-300 relative">
               <Lottie
@@ -261,7 +270,6 @@ const HomePage = () => {
             </div>
           )}
 
-          {/* CTA Button */}
           <div className="mt-8 animate-fadeInUp delay-300">
             <button
               type="submit"

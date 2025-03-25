@@ -1,88 +1,143 @@
-import { call, put, all, takeEvery } from "redux-saga/effects";
+import { call, put, all, takeEvery, delay } from "redux-saga/effects";
 import axios from "axios";
 import {
-  fetchProductsRequest,
-  fetchProductsSuccess,
-  fetchProductsFailure,
-  sendSelectedProductsRequest,
-  sendSelectedProductsSuccess,
-  sendSelectedProductsFailure,
-  fetchMyCompanyProductsRequest,
-  fetchMyCompanyProductsSuccess,
-  fetchMyCompanyProductsFailure,
+  fetchCompetitorBrandsRequest,
+  fetchCompetitorBrandsSuccess,
+  fetchCompetitorBrandsFailure,
+  fetchCompetitorProductsRequest,
+  fetchCompetitorProductsSuccess,
+  fetchCompetitorProductsFailure,
+  fetchCompetitorProductsDetailsRequest,
+  fetchCompetitorProductsDetailsSuccess,
+  fetchCompetitorProductsDetailsFailure,
+  fetchCategoryListRequest,
+  fetchCategoryListSuccess,
+  fetchCategoryListFailure,
 } from "./productsSlice";
+import {
+  fetchDummyCategory,
+  fetchCompetitorsDummy,
+  fetchCompetitorProductsDummy,
+  fetchSelectedCompetitorProductsDetailsDummy,
+} from "../utils/dummyData";
 
-// Saga to fetch products with parameters
-function* fetchProductsSaga(action) {
+const useDummyData = process.env.NEXT_PUBLIC_USE_DUMMY_DATA === "true";
+
+// Fetch Competitor Brands
+function* fetchCompetitorBrandsSaga(action) {
   try {
-    const { category, companyNamesInput } = action.payload;
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/fetch/?product_name=${category}&company_names_input=${companyNamesInput}`;
-    const response = yield call(axios.get, apiUrl);
-    yield put(fetchProductsSuccess(response.data));
-  } catch (error) {
-    yield put(
-      fetchProductsFailure(
-        error.response?.data?.message || "Failed to fetch products"
-      )
+    const { category_name, brand_name } = action.payload;
+    if (useDummyData) {
+      yield delay(500);
+      const data = fetchCompetitorsDummy();
+      yield put(fetchCompetitorBrandsSuccess(data.competitors));
+      return;
+    }
+    const response = yield call(
+      axios.post,
+      `${process.env.NEXT_PUBLIC_API_URL}/fetch-competitors`,
+      { category_name, brand_name }
     );
+    yield put(fetchCompetitorBrandsSuccess(response.data.competitors));
+  } catch (error) {
+    yield put(fetchCompetitorBrandsFailure(error.message));
   }
 }
 
-// New saga to send selected products via POST call
-function* sendSelectedProductsSaga(action) {
+// Fetch Competitor Products
+function* fetchCompetitorProductsSaga(action) {
   try {
-    const { selectedProducts } = action.payload;
-
-    console.log("selectedProducts 2", selectedProducts);
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/update`;
-    const response = yield call(axios.post, apiUrl, selectedProducts);
-    yield put(sendSelectedProductsSuccess(response.data));
-  } catch (error) {
-    yield put(
-      sendSelectedProductsFailure(
-        error.response?.data?.message || "Failed to send selected products"
-      )
+    const { category_name, brand_name, selected_competitor_names } =
+      action.payload;
+    if (useDummyData) {
+      yield delay(500);
+      const data = fetchCompetitorProductsDummy();
+      yield put(fetchCompetitorProductsSuccess(data.products));
+      return;
+    }
+    const response = yield call(
+      axios.post,
+      `${process.env.NEXT_PUBLIC_API_URL}/fetch-products`,
+      {
+        category_name,
+        brand_name,
+        selected_competitor_names,
+      }
     );
+    yield put(fetchCompetitorProductsSuccess(response.data.products));
+  } catch (error) {
+    yield put(fetchCompetitorProductsFailure(error.message));
   }
 }
 
-// Saga to fetch products with parameters
-function* fetchMyCompanyProductsSaga(action) {
+// Fetch Competitor Products Details
+function* fetchCompetitorProductsDetailsSaga(action) {
   try {
-    const { category, companyNamesInput } = action.payload;
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/fetch/?product_name=${category}&company_names_input=${companyNamesInput}`;
-    const response = yield call(axios.get, apiUrl);
-    yield put(fetchMyCompanyProductsSuccess(response.data));
-  } catch (error) {
-    yield put(
-      fetchMyCompanyProductsFailure(
-        error.response?.data?.message || "Failed to fetch products"
-      )
+    const { selected_product_model_names, category_name } = action.payload;
+    if (useDummyData) {
+      yield delay(500);
+      const data = fetchSelectedCompetitorProductsDetailsDummy();
+      yield put(fetchCompetitorProductsDetailsSuccess(data.details));
+      return;
+    }
+    const response = yield call(
+      axios.post,
+      `${process.env.NEXT_PUBLIC_API_URL}/fetch-products-details`,
+      { selected_product_model_names, category_name }
     );
+    yield put(fetchCompetitorProductsDetailsSuccess(response.data.details));
+  } catch (error) {
+    yield put(fetchCompetitorProductsDetailsFailure(error.message));
   }
 }
 
-// Watcher sagas
-function* watchFetchProducts() {
-  yield takeEvery(fetchProductsRequest.type, fetchProductsSaga);
+// Fetch Category List
+function* fetchCategoryListSaga() {
+  try {
+    if (useDummyData) {
+      yield delay(500);
+      const data = fetchDummyCategory();
+      yield put(fetchCategoryListSuccess(data.categories));
+      return;
+    }
+    const response = yield call(
+      axios.get,
+      `${process.env.NEXT_PUBLIC_API_URL}/fetch-categories`
+    );
+    yield put(fetchCategoryListSuccess(response.data.categories));
+  } catch (error) {
+    yield put(fetchCategoryListFailure(error.message));
+  }
 }
 
-function* watchSendSelectedProducts() {
-  yield takeEvery(sendSelectedProductsRequest.type, sendSelectedProductsSaga);
+// Watchers
+function* watchFetchCompetitorBrands() {
+  yield takeEvery(fetchCompetitorBrandsRequest.type, fetchCompetitorBrandsSaga);
 }
 
-function* watchMyCompanyFetchProducts() {
+function* watchFetchCompetitorProducts() {
   yield takeEvery(
-    fetchMyCompanyProductsRequest.type,
-    fetchMyCompanyProductsSaga
+    fetchCompetitorProductsRequest.type,
+    fetchCompetitorProductsSaga
   );
 }
 
-// Root saga
+function* watchFetchCompetitorProductsDetails() {
+  yield takeEvery(
+    fetchCompetitorProductsDetailsRequest.type,
+    fetchCompetitorProductsDetailsSaga
+  );
+}
+
+function* watchFetchCategoryList() {
+  yield takeEvery(fetchCategoryListRequest.type, fetchCategoryListSaga);
+}
+
 export default function* productsSaga() {
   yield all([
-    watchFetchProducts(),
-    watchSendSelectedProducts(),
-    watchMyCompanyFetchProducts(),
+    watchFetchCompetitorBrands(),
+    watchFetchCompetitorProducts(),
+    watchFetchCompetitorProductsDetails(),
+    watchFetchCategoryList(),
   ]);
 }

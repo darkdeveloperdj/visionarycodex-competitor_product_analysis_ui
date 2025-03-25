@@ -35,8 +35,8 @@ const ProductSelection = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const {
-    productName,
-    companyNamesInput,
+    categoryName,
+    brandName,
     allProducts: apiProducts,
     loading,
   } = useSelector((state) => state.products);
@@ -44,13 +44,10 @@ const ProductSelection = () => {
   const [mounted, setMounted] = useState(false);
   const [localSelected, setLocalSelected] = useState([]);
   const hasFetched = useRef(false);
-  const category = productName?.toLowerCase() || "";
+  const category = categoryName?.toLowerCase() || "";
   const brands = useMemo(
-    () =>
-      companyNamesInput
-        ? companyNamesInput.split(",").map((b) => b.trim())
-        : [],
-    [companyNamesInput]
+    () => (brandName ? brandName.split(",").map((b) => b.trim()) : []),
+    [brandName]
   );
 
   const flattenedProducts = useMemo(
@@ -68,12 +65,12 @@ const ProductSelection = () => {
 
     if (!hasFetched.current && isMounted) {
       // Dispatch the products request
-      dispatch(fetchProductsRequest({ category, companyNamesInput }));
+      dispatch(fetchProductsRequest({ category, brandName }));
       // Dispatch the myCompanyProducts request with company "TechNova"
       dispatch(
         fetchMyCompanyProductsRequest({
           category,
-          companyNamesInput: "TechNova",
+          brandName: "TechNova",
         })
       );
       hasFetched.current = true;
@@ -82,7 +79,7 @@ const ProductSelection = () => {
     return () => {
       isMounted = false;
     };
-  }, [dispatch, category, companyNamesInput]);
+  }, [dispatch, category, brandName]);
 
   useEffect(() => {
     if (flattenedProducts.length !== apiProducts.length) {
