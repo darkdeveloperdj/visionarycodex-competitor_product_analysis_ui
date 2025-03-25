@@ -192,7 +192,7 @@ export const fetchCompetitorProductsDummy = () => ({
         bluetooth: true,
         wifi: true,
         gps: true,
-        nfc: true,
+        nfc: false,
         dualSim: false,
         assistant: "Google Assistant",
         batteryLife: "10 hours",

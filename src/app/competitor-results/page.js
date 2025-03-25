@@ -123,7 +123,7 @@ const CompetitorResults = () => {
     return Array.from(featuresSet);
   }, [competitorProducts]);
 
-  // Updated toggle function - now toggles for all products, including my products.
+  // Toggle for all products, including my products.
   const toggleActiveFilter = (product) => {
     setActiveFilters((prev) => {
       const newSet = new Set(prev);
@@ -431,12 +431,80 @@ const CompetitorResults = () => {
             </div>
           </div>
 
-          {/* Data Report */}
+          {/* Analysis Report with Additional Details */}
           <div className="mb-12 animate-fadeInUp delay-300">
             <h3 className="text-2xl font-bold mb-6 text-gray-700">
               📊 Analysis Report
             </h3>
-            <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-lg"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {activeSelectedProducts.map((product) => {
+                const details = product.details || {};
+                const reviewSentiment = details.reviewSentiment || {};
+                const featureImportance = details.featureImportance || {};
+                return (
+                  <div
+                    key={product.model}
+                    className="bg-white p-6 rounded-xl border border-gray-200 hover:border-purple-300 transition-all"
+                  >
+                    <h4 className="text-lg font-semibold text-gray-700 mb-2">
+                      {product.model} Analysis
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      <strong>Price:</strong> ${details.price}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong>User Rating:</strong> {details.userRating}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong>Number of Reviews:</strong>{" "}
+                      {details.numberOfReviews}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong>Special Features:</strong>{" "}
+                      {details.specialFeatures}
+                    </p>
+                    <div className="mt-4">
+                      <h5 className="text-md font-medium text-gray-700">
+                        Review Sentiment
+                      </h5>
+                      <ul className="list-disc list-inside text-sm text-gray-600">
+                        <li>
+                          <strong>Positive:</strong>{" "}
+                          {reviewSentiment.positive || "N/A"}
+                        </li>
+                        <li>
+                          <strong>Neutral:</strong>{" "}
+                          {reviewSentiment.neutral || "N/A"}
+                        </li>
+                        <li>
+                          <strong>Negative:</strong>{" "}
+                          {reviewSentiment.negative || "N/A"}
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="mt-4">
+                      <h5 className="text-md font-medium text-gray-700">
+                        Feature Importance
+                      </h5>
+                      <ul className="list-disc list-inside text-sm text-gray-600">
+                        <li>
+                          <strong>Price:</strong>{" "}
+                          {featureImportance.price || "N/A"}
+                        </li>
+                        <li>
+                          <strong>User Rating:</strong>{" "}
+                          {featureImportance.userRating || "N/A"}
+                        </li>
+                        <li>
+                          <strong>Special Features:</strong>{" "}
+                          {featureImportance.specialFeatures || "N/A"}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Customer Reviews */}
