@@ -52,7 +52,29 @@ function* fetchCompetitorProductsSaga(action) {
     if (useDummyData) {
       yield delay(2000);
       const data = fetchCompetitorProductsDummy();
-      yield put(fetchCompetitorProductsSuccess(data.products));
+
+      const filteredProducts = data.products.filter((product) => {
+        // Assume all dummy products belong to "electronics"
+        if (category_name.toLowerCase() !== "electronics") return false;
+        // Include all my products without filtering by brand_name
+        if (product.isMyCompanyProduct) {
+          return true;
+        }
+        // For competitor products, check if competitorName is in the provided list
+        return selected_competitor_names.some(
+          (name) => name.toLowerCase() === product.competitorName.toLowerCase()
+        );
+      });
+
+      // For my products, force competitorName to "TechNova"
+      const updatedProducts = filteredProducts.map((product) => {
+        if (product.isMyCompanyProduct) {
+          return { ...product, competitorName: "TechNova" };
+        }
+        return product;
+      });
+
+      yield put(fetchCompetitorProductsSuccess(updatedProducts));
       return;
     }
     const response = yield call(
