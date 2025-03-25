@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -23,36 +23,41 @@ const CompetitorSelection = () => {
   const [mounted, setMounted] = useState(false);
   const [localSelected, setLocalSelected] = useState([]);
   const hasFetched = useRef(false);
-  const category = categoryName?.toLowerCase() || "";
+
+  // Compute formatted category name (capitalized) once using useMemo.
+  const formattedCategory = useMemo(() => {
+    if (!categoryName) return "";
+    return (
+      categoryName.charAt(0).toUpperCase() + categoryName.slice(1).toLowerCase()
+    );
+  }, [categoryName]);
 
   useEffect(() => {
     setMounted(true);
     if (!hasFetched.current) {
-      // Dispatch competitor brands request with category and brand name
       dispatch(
         fetchCompetitorBrandsRequest({
-          category_name: category,
+          category_name: categoryName?.toLowerCase() || "",
           brand_name: brandName,
         })
       );
       hasFetched.current = true;
     }
-  }, [dispatch, category, brandName]);
+  }, [dispatch, categoryName, brandName]);
 
-  const toggleCompetitor = (competitor) => {
+  const toggleCompetitor = useCallback((competitor) => {
     setLocalSelected((prev) =>
       prev.includes(competitor.id)
         ? prev.filter((id) => id !== competitor.id)
         : [...prev, competitor.id]
     );
-  };
+  }, []);
 
   const handleProceed = () => {
     if (!localSelected.length) return;
     const selectedCompetitors = competitorBrands.filter((c) =>
       localSelected.includes(c.id)
     );
-    // Extract only the competitor names to send
     const selectedCompetitorNames = selectedCompetitors.map(
       (competitor) => competitor.competitorName
     );
@@ -94,10 +99,8 @@ const CompetitorSelection = () => {
             className="w-40 h-40 mx-auto"
           />
           <h1 className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl font-extrabold text-center w-full bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-            {category
-              ? `${
-                  category.charAt(0).toUpperCase() + category.slice(1)
-                } Competitors`
+            {formattedCategory
+              ? `${formattedCategory} Competitors`
               : "Competitor Selection"}
           </h1>
         </div>
@@ -108,89 +111,92 @@ const CompetitorSelection = () => {
             <span className="font-semibold text-purple-600 animate-pulse">
               {brandName}
             </span>{" "}
-            {category && (
+            {formattedCategory && (
               <>
                 in{" "}
                 <span className="font-semibold text-indigo-600">
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                  {formattedCategory}
                 </span>
               </>
             )}
           </p>
         </div>
 
-        {competitorBrands && competitorBrands.length > 0 ? (
-          // Updated grid container for 2 competitors per row
+        {competitorBrands?.length ? (
           <div className="grid grid-cols-2 gap-4 mb-8">
-            {competitorBrands.map((competitor) => (
-              <label
-                key={competitor.id}
-                className={`flex flex-col p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:scale-[1.02] group ${
-                  localSelected.includes(competitor.id)
-                    ? "border-purple-500 bg-purple-100 shadow-md"
-                    : "border-gray-200 hover:border-purple-300 bg-white"
-                }`}
-              >
-                <div className="flex items-center mb-2">
-                  <div
-                    className={`w-6 h-6 flex items-center justify-center mr-4 border-2 rounded-md transition-all ${
-                      localSelected.includes(competitor.id)
-                        ? "bg-purple-500 border-purple-500 scale-110"
-                        : "border-gray-400 hover:border-purple-300"
-                    }`}
-                  >
-                    {localSelected.includes(competitor.id) && (
-                      <Lottie
-                        animationData={checkmarkAnimation}
-                        loop={false}
-                        autoplay
-                        className="w-4 h-4"
-                      />
-                    )}
+            {competitorBrands.map((competitor) => {
+              const isSelected = localSelected.includes(competitor.id);
+              return (
+                <label
+                  key={competitor.id}
+                  className={`flex flex-col p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:scale-[1.02] group ${
+                    isSelected
+                      ? "border-purple-500 bg-purple-100 shadow-md"
+                      : "border-gray-200 hover:border-purple-300 bg-white"
+                  }`}
+                >
+                  <div className="flex items-center mb-2">
+                    <div
+                      className={`w-6 h-6 flex items-center justify-center mr-4 border-2 rounded-md transition-all ${
+                        isSelected
+                          ? "bg-purple-500 border-purple-500 scale-110"
+                          : "border-gray-400 hover:border-purple-300"
+                      }`}
+                    >
+                      {isSelected && (
+                        <Lottie
+                          animationData={checkmarkAnimation}
+                          loop={false}
+                          autoplay
+                          className="w-4 h-4"
+                        />
+                      )}
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {competitor.competitorName}
+                    </h3>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {competitor.competitorName}
-                  </h3>
-                </div>
-                <div className="text-sm text-gray-600">
-                  <div>
-                    <span className="font-medium">Founded:</span>{" "}
-                    {competitor.founded || "N/A"}
+                  <div className="text-sm text-gray-600">
+                    <div>
+                      <span className="font-medium">Founded:</span>{" "}
+                      {competitor.founded || "N/A"}
+                    </div>
+                    <div>
+                      <span className="font-medium">Headquarters:</span>{" "}
+                      {competitor.headquarters || "N/A"}
+                    </div>
+                    <div>
+                      <span className="font-medium">Industry:</span>{" "}
+                      {competitor.industry || "N/A"}
+                    </div>
+                    <div>
+                      <span className="font-medium">Revenue:</span>{" "}
+                      {competitor.revenue || "N/A"}
+                    </div>
                   </div>
-                  <div>
-                    <span className="font-medium">Headquarters:</span>{" "}
-                    {competitor.headquarters || "N/A"}
+                  <div className="mt-2">
+                    <Lottie
+                      animationData={sparkleAnimation}
+                      loop
+                      autoplay
+                      className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    />
                   </div>
-                  <div>
-                    <span className="font-medium">Industry:</span>{" "}
-                    {competitor.industry || "N/A"}
-                  </div>
-                  <div>
-                    <span className="font-medium">Revenue:</span>{" "}
-                    {competitor.revenue || "N/A"}
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <Lottie
-                    animationData={sparkleAnimation}
-                    loop
-                    autoplay
-                    className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleCompetitor(competitor)}
+                    className="hidden"
                   />
-                </div>
-                <input
-                  type="checkbox"
-                  checked={localSelected.includes(competitor.id)}
-                  onChange={() => toggleCompetitor(competitor)}
-                  className="hidden"
-                />
-              </label>
-            ))}
+                </label>
+              );
+            })}
           </div>
         ) : (
           <div className="animate-fadeInUp text-center p-6 bg-purple-50 rounded-lg border border-purple-200">
             <p className="text-gray-700">
-              No competitors found for your brand in the {category} category.
+              No competitors found for your brand in the{" "}
+              {formattedCategory || categoryName} category.
             </p>
           </div>
         )}
