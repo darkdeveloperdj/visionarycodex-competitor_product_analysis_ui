@@ -9,13 +9,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCategoryName, setBrandName } from "../store/product/productsSlice";
 import { fetchCategoryListRequest } from "../store/product/productsSlice";
 
-// Optional: If you want to provide display names for categories
-const categoryLabels = {
-  electronics: "Electronics",
-  fashion: "Fashion",
-  home: "Home & Living",
-  beauty: "Beauty & Health",
-  sports: "Sports & Outdoors",
+// Helper function to capitalize each word
+const formatText = (input) => {
+  return input
+    .trim()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
 };
 
 const HomePage = () => {
@@ -35,10 +35,10 @@ const HomePage = () => {
     dispatch(fetchCategoryListRequest());
   }, [dispatch]);
 
-  // Once the categoryList is loaded, set the default selected category.
+  // Once the categoryList is loaded, set the default selected category (capitalized)
   useEffect(() => {
     if (categoryList && categoryList.length > 0 && !selectedCategory) {
-      setSelectedCategory(categoryList[0].categoryName);
+      setSelectedCategory(formatText(categoryList[0].categoryName));
     }
   }, [categoryList, selectedCategory]);
 
@@ -118,20 +118,25 @@ const HomePage = () => {
               <select
                 name="category_name"
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e) =>
+                  setSelectedCategory(formatText(e.target.value))
+                }
                 className="w-full p-4 pl-6 pr-10 text-gray-700 bg-white/95 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none transition-all duration-300 hover:border-purple-400 hover:shadow-md"
                 required
               >
                 {categoryList && categoryList.length > 0 ? (
-                  categoryList.map((cat) => (
-                    <option
-                      key={cat.id}
-                      value={cat.categoryName}
-                      className="bg-white text-gray-700"
-                    >
-                      {categoryLabels[cat.categoryName] || cat.categoryName}
-                    </option>
-                  ))
+                  categoryList.map((cat) => {
+                    const formattedCategory = formatText(cat.categoryName);
+                    return (
+                      <option
+                        key={cat.id}
+                        value={formattedCategory}
+                        className="bg-white text-gray-700"
+                      >
+                        {formattedCategory}
+                      </option>
+                    );
+                  })
                 ) : (
                   <option value="" disabled>
                     Loading categories...
@@ -281,7 +286,7 @@ const HomePage = () => {
                 </span>{" "}
                 in{" "}
                 <span className="font-semibold text-indigo-600">
-                  {categoryLabels[selectedCategory] || selectedCategory}
+                  {selectedCategory}
                 </span>
               </p>
             </div>
