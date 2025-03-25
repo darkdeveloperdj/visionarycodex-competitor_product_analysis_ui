@@ -6,8 +6,51 @@ import {
   fetchCompetitorProductsRequest,
 } from "../store/product/productsSlice";
 import Lottie from "lottie-react";
+import { motion } from "framer-motion";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/SearchPage.css";
+
+// Custom hook for filter state management
+const useFilters = (initialProducts) => {
+  const [activeFilters, setActiveFilters] = useState(new Set());
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
+
+  useEffect(() => {
+    const allModels = initialProducts.map((p) => p.model);
+    setActiveFilters(new Set(allModels));
+  }, [initialProducts]);
+
+  const toggleActiveFilter = (product) => {
+    setActiveFilters((prev) => {
+      const newSet = new Set(prev);
+      newSet.has(product.model)
+        ? newSet.delete(product.model)
+        : newSet.add(product.model);
+      return newSet;
+    });
+  };
+
+  const toggleFeatureSelection = (feature) => {
+    setSelectedFeatures((prev) =>
+      prev.includes(feature)
+        ? prev.filter((f) => f !== feature)
+        : [...prev, feature]
+    );
+  };
+
+  const resetFilters = (allModels) => {
+    setSelectedFeatures([]);
+    setActiveFilters(new Set(allModels));
+  };
+
+  return {
+    activeFilters,
+    selectedFeatures,
+    toggleActiveFilter,
+    toggleFeatureSelection,
+    resetFilters,
+  };
+};
 
 const StarRating = React.memo(({ rating }) => {
   const fullStars = Math.floor(rating);
@@ -40,7 +83,12 @@ const FilterPanel = React.memo(
     toggleFeatureSelection,
     handleResetFilters,
   }) => (
-    <div className="w-80 p-6 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200 animate-slideInLeft">
+    <motion.div
+      initial={{ x: -50, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="w-80 p-6 bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200"
+    >
       <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
         🔍 Filters
       </h2>
@@ -138,13 +186,18 @@ const FilterPanel = React.memo(
       >
         🔄 Reset Filters
       </button>
-    </div>
+    </motion.div>
   )
 );
 
 const FeatureComparisonTable = React.memo(
   ({ activeSelectedProducts, selectedFeatures }) => (
-    <div className="mb-12 animate-fadeInUp delay-100">
+    <motion.div
+      initial={{ y: 30, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, delay: 0.1 }}
+      className="mb-12"
+    >
       <h3 className="text-2xl font-bold mb-6 text-gray-800">
         📜 Feature Matrix
       </h3>
@@ -204,12 +257,17 @@ const FeatureComparisonTable = React.memo(
           </tbody>
         </table>
       </div>
-    </div>
+    </motion.div>
   )
 );
 
 const MarketInsightsPanel = React.memo(({ activeSelectedProducts }) => (
-  <div className="mb-12 animate-fadeInUp delay-200">
+  <motion.div
+    initial={{ y: 30, opacity: 0 }}
+    animate={{ y: 0, opacity: 1 }}
+    transition={{ duration: 0.6, delay: 0.2 }}
+    className="mb-12"
+  >
     <h3 className="text-2xl font-bold mb-6 text-gray-800">
       💡 Market Insights
     </h3>
@@ -278,11 +336,16 @@ const MarketInsightsPanel = React.memo(({ activeSelectedProducts }) => (
         );
       })}
     </div>
-  </div>
+  </motion.div>
 ));
 
 const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
-  <div className="mb-12 animate-fadeInUp delay-300">
+  <motion.div
+    initial={{ y: 30, opacity: 0 }}
+    animate={{ y: 0, opacity: 1 }}
+    transition={{ duration: 0.6, delay: 0.3 }}
+    className="mb-12"
+  >
     <h3 className="text-2xl font-bold mb-6 text-gray-800">
       📊 Analysis Report
     </h3>
@@ -372,11 +435,15 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
         );
       })}
     </div>
-  </div>
+  </motion.div>
 ));
 
 const CustomerReviewsPanel = React.memo(({ activeSelectedProducts }) => (
-  <div className="animate-fadeInUp delay-500">
+  <motion.div
+    initial={{ y: 30, opacity: 0 }}
+    animate={{ y: 0, opacity: 1 }}
+    transition={{ duration: 0.6, delay: 0.5 }}
+  >
     <h3 className="text-2xl font-bold mb-6 text-gray-800">
       😊 Customer Feedback
     </h3>
@@ -446,7 +513,7 @@ const CustomerReviewsPanel = React.memo(({ activeSelectedProducts }) => (
         );
       })}
     </div>
-  </div>
+  </motion.div>
 ));
 
 const CompetitorResults = () => {
@@ -468,8 +535,14 @@ const CompetitorResults = () => {
     [competitorProducts]
   );
 
-  const [activeFilters, setActiveFilters] = useState(new Set());
-  const [selectedFeatures, setSelectedFeatures] = useState([]);
+  const {
+    activeFilters,
+    selectedFeatures,
+    toggleActiveFilter,
+    toggleFeatureSelection,
+    resetFilters,
+  } = useFilters(competitorProducts);
+
   const [mounted, setMounted] = useState(false);
   const [lastSentFilters, setLastSentFilters] = useState(null);
 
@@ -494,11 +567,6 @@ const CompetitorResults = () => {
   }, []);
 
   useEffect(() => {
-    const allModels = competitorProducts.map((p) => p.model);
-    setActiveFilters(new Set(allModels));
-  }, [competitorProducts]);
-
-  useEffect(() => {
     const currentFilters = Array.from(activeFilters);
     if (JSON.stringify(currentFilters) !== JSON.stringify(lastSentFilters)) {
       dispatch(
@@ -517,28 +585,9 @@ const CompetitorResults = () => {
     return Array.from(featuresSet);
   }, [competitorProducts]);
 
-  const toggleActiveFilter = (product) => {
-    setActiveFilters((prev) => {
-      const newSet = new Set(prev);
-      newSet.has(product.model)
-        ? newSet.delete(product.model)
-        : newSet.add(product.model);
-      return newSet;
-    });
-  };
-
-  const toggleFeatureSelection = (feature) => {
-    setSelectedFeatures((prev) =>
-      prev.includes(feature)
-        ? prev.filter((f) => f !== feature)
-        : [...prev, feature]
-    );
-  };
-
   const handleResetFilters = () => {
     const allModels = competitorProducts.map((p) => p.model);
-    setSelectedFeatures([]);
-    setActiveFilters(new Set(allModels));
+    resetFilters(allModels);
   };
 
   const activeSelectedProducts = useMemo(
@@ -579,10 +628,11 @@ const CompetitorResults = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-gray-100/40" />
       </div>
-      <div
-        className={`flex gap-8 transform transition-all duration-1000 relative z-10 ${
-          mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-        }`}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={mounted ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.8 }}
+        className="flex gap-8 relative z-10"
       >
         <FilterPanel
           myProducts={myProducts}
@@ -594,7 +644,7 @@ const CompetitorResults = () => {
           toggleFeatureSelection={toggleFeatureSelection}
           handleResetFilters={handleResetFilters}
         />
-        <div className="flex-1 p-8 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200">
+        <div className="flex-1 p-8 bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200">
           <h2 className="text-4xl font-extrabold text-center mb-10 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-pulse">
             📊 {query.charAt(0).toUpperCase() + query.slice(1)} Competitive
             Analysis
@@ -613,7 +663,7 @@ const CompetitorResults = () => {
             activeSelectedProducts={activeSelectedProducts}
           />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

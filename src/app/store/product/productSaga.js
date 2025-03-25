@@ -7,9 +7,6 @@ import {
   fetchCompetitorProductsRequest,
   fetchCompetitorProductsSuccess,
   fetchCompetitorProductsFailure,
-  fetchCompetitorProductsDetailsRequest,
-  fetchCompetitorProductsDetailsSuccess,
-  fetchCompetitorProductsDetailsFailure,
   fetchCategoryListRequest,
   fetchCategoryListSuccess,
   fetchCategoryListFailure,
@@ -92,27 +89,6 @@ function* fetchCompetitorProductsSaga(action) {
   }
 }
 
-// Fetch Competitor Products Details
-function* fetchCompetitorProductsDetailsSaga(action) {
-  try {
-    const { selected_product_model_names, category_name } = action.payload;
-    if (useDummyData) {
-      yield delay(2000);
-      const data = fetchSelectedCompetitorProductsDetailsDummy();
-      yield put(fetchCompetitorProductsDetailsSuccess(data.details));
-      return;
-    }
-    const response = yield call(
-      axios.post,
-      `${process.env.NEXT_PUBLIC_API_URL}/fetch-products-details`,
-      { selected_product_model_names, category_name }
-    );
-    yield put(fetchCompetitorProductsDetailsSuccess(response.data.details));
-  } catch (error) {
-    yield put(fetchCompetitorProductsDetailsFailure(error.message));
-  }
-}
-
 // Fetch Category List
 function* fetchCategoryListSaga() {
   try {
@@ -144,13 +120,6 @@ function* watchFetchCompetitorProducts() {
   );
 }
 
-function* watchFetchCompetitorProductsDetails() {
-  yield takeEvery(
-    fetchCompetitorProductsDetailsRequest.type,
-    fetchCompetitorProductsDetailsSaga
-  );
-}
-
 function* watchFetchCategoryList() {
   yield takeEvery(fetchCategoryListRequest.type, fetchCategoryListSaga);
 }
@@ -159,7 +128,6 @@ export default function* productsSaga() {
   yield all([
     watchFetchCompetitorBrands(),
     watchFetchCompetitorProducts(),
-    watchFetchCompetitorProductsDetails(),
     watchFetchCategoryList(),
   ]);
 }

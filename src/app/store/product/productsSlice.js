@@ -53,20 +53,6 @@ const productsSlice = createSlice({
       state.error = action.payload;
     },
 
-    // Competitor Products Details
-    fetchCompetitorProductsDetailsRequest: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    fetchCompetitorProductsDetailsSuccess: (state, action) => {
-      state.loading = false;
-      state.competitorProductsDetails = action.payload;
-    },
-    fetchCompetitorProductsDetailsFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-
     // Selected Products Submission
     sendSelectedProductsRequest: (state) => {
       state.loading = true;
@@ -111,9 +97,6 @@ export const {
   fetchCompetitorProductsRequest,
   fetchCompetitorProductsSuccess,
   fetchCompetitorProductsFailure,
-  fetchCompetitorProductsDetailsRequest,
-  fetchCompetitorProductsDetailsSuccess,
-  fetchCompetitorProductsDetailsFailure,
   sendSelectedProductsRequest,
   sendSelectedProductsSuccess,
   sendSelectedProductsFailure,
