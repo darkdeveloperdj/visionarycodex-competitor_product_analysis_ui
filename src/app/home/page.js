@@ -1,14 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { category } from "../utils/dummyData";
 import Lottie from "lottie-react";
 import analyticsAnimation from "../../../public/assets/animations/analytics-animation.json";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/HomePage.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCategoryName, setBrandName } from "../store/product/productsSlice";
+import { fetchCategoryListRequest } from "../store/product/productsSlice";
 
+// Optional: If you want to provide display names for categories
 const categoryLabels = {
   electronics: "Electronics",
   fashion: "Fashion",
@@ -20,16 +21,26 @@ const categoryLabels = {
 const HomePage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const categoryList = useSelector((state) => state.products.categoryList);
 
   const [query, setQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(category[0]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [showError, setShowError] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showCopiedFeedback, setShowCopiedFeedback] = useState(false);
 
+  // On mount, dispatch the fetch for category list and set mounted flag.
   useEffect(() => {
     setMounted(true);
-  }, []);
+    dispatch(fetchCategoryListRequest());
+  }, [dispatch]);
+
+  // Once the categoryList is loaded, set the default selected category.
+  useEffect(() => {
+    if (categoryList && categoryList.length > 0 && !selectedCategory) {
+      setSelectedCategory(categoryList[0].categoryName);
+    }
+  }, [categoryList, selectedCategory]);
 
   const formatCompanyInput = (input) => {
     return input
@@ -111,15 +122,21 @@ const HomePage = () => {
                 className="w-full p-4 pl-6 pr-10 text-gray-700 bg-white/95 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none transition-all duration-300 hover:border-purple-400 hover:shadow-md"
                 required
               >
-                {category.map((cat) => (
-                  <option
-                    key={cat}
-                    value={cat}
-                    className="bg-white text-gray-700"
-                  >
-                    {categoryLabels[cat]}
+                {categoryList && categoryList.length > 0 ? (
+                  categoryList.map((cat) => (
+                    <option
+                      key={cat.id}
+                      value={cat.categoryName}
+                      className="bg-white text-gray-700"
+                    >
+                      {categoryLabels[cat.categoryName] || cat.categoryName}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>
+                    Loading categories...
                   </option>
-                ))}
+                )}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 transition-transform group-hover:scale-110">
                 <svg
@@ -264,7 +281,7 @@ const HomePage = () => {
                 </span>{" "}
                 in{" "}
                 <span className="font-semibold text-indigo-600">
-                  {categoryLabels[selectedCategory]}
+                  {categoryLabels[selectedCategory] || selectedCategory}
                 </span>
               </p>
             </div>

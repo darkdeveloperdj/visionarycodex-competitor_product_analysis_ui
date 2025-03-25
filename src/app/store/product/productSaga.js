@@ -19,7 +19,7 @@ import {
   fetchCompetitorsDummy,
   fetchCompetitorProductsDummy,
   fetchSelectedCompetitorProductsDetailsDummy,
-} from "../utils/dummyData";
+} from "../../utils/dummyData";
 
 const useDummyData = process.env.NEXT_PUBLIC_USE_DUMMY_DATA === "true";
 
@@ -28,7 +28,7 @@ function* fetchCompetitorBrandsSaga(action) {
   try {
     const { category_name, brand_name } = action.payload;
     if (useDummyData) {
-      yield delay(500);
+      yield delay(2000);
       const data = fetchCompetitorsDummy();
       yield put(fetchCompetitorBrandsSuccess(data.competitors));
       return;
@@ -50,7 +50,7 @@ function* fetchCompetitorProductsSaga(action) {
     const { category_name, brand_name, selected_competitor_names } =
       action.payload;
     if (useDummyData) {
-      yield delay(500);
+      yield delay(2000);
       const data = fetchCompetitorProductsDummy();
       yield put(fetchCompetitorProductsSuccess(data.products));
       return;
@@ -75,7 +75,7 @@ function* fetchCompetitorProductsDetailsSaga(action) {
   try {
     const { selected_product_model_names, category_name } = action.payload;
     if (useDummyData) {
-      yield delay(500);
+      yield delay(2000);
       const data = fetchSelectedCompetitorProductsDetailsDummy();
       yield put(fetchCompetitorProductsDetailsSuccess(data.details));
       return;
@@ -95,7 +95,7 @@ function* fetchCompetitorProductsDetailsSaga(action) {
 function* fetchCategoryListSaga() {
   try {
     if (useDummyData) {
-      yield delay(500);
+      yield delay(2000);
       const data = fetchDummyCategory();
       yield put(fetchCategoryListSuccess(data.categories));
       return;
