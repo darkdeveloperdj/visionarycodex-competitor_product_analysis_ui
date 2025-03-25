@@ -17,7 +17,6 @@ import {
 import Lottie from "lottie-react";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/SearchPage.css";
-// import { myCompanyProducts } from "../demo_data/index";
 
 ChartJS.register(
   CategoryScale,
@@ -63,7 +62,7 @@ const parseInvalidJson = (str) => {
   }
 };
 
-const SearchPage = () => {
+const CompetitorResults = () => {
   const dispatch = useDispatch();
   const {
     categoryName,
@@ -548,4 +547,4 @@ const SearchPage = () => {
   );
 };
 
-export default SearchPage;
+export default CompetitorResults;

@@ -1,12 +1,10 @@
 "use client";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchProductsRequest,
-  fetchMyCompanyProductsRequest,
-  setSelectedProducts,
-  setAllProducts,
+  fetchCompetitorBrandsRequest,
+  setSelectedCompetitorBrands, // reusing this action to store selected competitors
 } from "../store/product/productsSlice";
 import Lottie from "lottie-react";
 import selectionAnimation from "../../../public/assets/animations/selection-animation.json";
@@ -15,103 +13,50 @@ import checkmarkAnimation from "../../../public/assets/animations/checkmark.json
 import sparkleAnimation from "../../../public/assets/animations/sparkle.json";
 import "../../../public/assets/css/CompetitorSelection.css";
 
-const parseFeatures = (featuresStr) => {
-  try {
-    return JSON.parse(featuresStr.replace(/'/g, '"'));
-  } catch (error) {
-    return {};
-  }
-};
-
-const parseInsights = (insightsStr) => {
-  try {
-    return JSON.parse(insightsStr.replace(/'/g, '"'));
-  } catch (error) {
-    return {};
-  }
-};
-
-const ProductSelection = () => {
+const CompetitorSelection = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const {
-    categoryName,
-    brandName,
-    allProducts: apiProducts,
-    loading,
-  } = useSelector((state) => state.products);
+  const { categoryName, brandName, competitorBrands, loading } = useSelector(
+    (state) => state.products
+  );
 
   const [mounted, setMounted] = useState(false);
   const [localSelected, setLocalSelected] = useState([]);
   const hasFetched = useRef(false);
   const category = categoryName?.toLowerCase() || "";
-  const brands = useMemo(
-    () => (brandName ? brandName.split(",").map((b) => b.trim()) : []),
-    [brandName]
-  );
-
-  const flattenedProducts = useMemo(
-    () =>
-      apiProducts.flat().map((p, i) => ({
-        ...p,
-        uniqueId: `${p.brand}-${p.model}-${i}`,
-      })),
-    [apiProducts]
-  );
 
   useEffect(() => {
-    let isMounted = true;
     setMounted(true);
-
-    if (!hasFetched.current && isMounted) {
-      // Dispatch the products request
-      dispatch(fetchProductsRequest({ category, brandName }));
-      // Dispatch the myCompanyProducts request with company "TechNova"
+    if (!hasFetched.current) {
+      // Dispatch competitor brands request with category and brand name
       dispatch(
-        fetchMyCompanyProductsRequest({
-          category,
-          brandName: "TechNova",
+        fetchCompetitorBrandsRequest({
+          category_name: category,
+          brand_name: brandName,
         })
       );
       hasFetched.current = true;
     }
-
-    return () => {
-      isMounted = false;
-    };
   }, [dispatch, category, brandName]);
 
-  useEffect(() => {
-    if (flattenedProducts.length !== apiProducts.length) {
-      dispatch(setAllProducts(flattenedProducts));
-    }
-  }, [flattenedProducts, apiProducts.length, dispatch]);
-
-  const groupedByBrand = useMemo(
-    () =>
-      flattenedProducts.reduce((acc, product) => {
-        const brand = product.brand;
-        acc[brand] = acc[brand] || [];
-        acc[brand].push(product);
-        return acc;
-      }, {}),
-    [flattenedProducts]
-  );
-
-  const toggleProduct = (product) => {
+  const toggleCompetitor = (competitor) => {
     setLocalSelected((prev) =>
-      prev.includes(product.uniqueId)
-        ? prev.filter((c) => c !== product.uniqueId)
-        : [...prev, product.uniqueId]
+      prev.includes(competitor.id)
+        ? prev.filter((id) => id !== competitor.id)
+        : [...prev, competitor.id]
     );
   };
 
   const handleProceed = () => {
     if (!localSelected.length) return;
-    const selected = flattenedProducts.filter((p) =>
-      localSelected.includes(p.uniqueId)
+    const selectedCompetitors = competitorBrands.filter((c) =>
+      localSelected.includes(c.id)
     );
-    dispatch(setSelectedProducts(selected));
+    // Extract only the competitor names to send
+    const selectedCompetitorNames = selectedCompetitors.map(
+      (competitor) => competitor.competitorName
+    );
+    dispatch(setSelectedCompetitorBrands(selectedCompetitorNames));
     router.push(`/competitor-results`);
   };
 
@@ -119,7 +64,7 @@ const ProductSelection = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
         <div className="animate-pulse text-2xl text-purple-600">
-          Loading products...
+          Loading competitors...
         </div>
       </div>
     );
@@ -152,20 +97,19 @@ const ProductSelection = () => {
             {category
               ? `${
                   category.charAt(0).toUpperCase() + category.slice(1)
-                } Products`
-              : "Product Selection"}
+                } Competitors`
+              : "Competitor Selection"}
           </h1>
         </div>
 
         <div className="text-center mb-8">
           <p className="text-lg text-gray-700">
-            Analyzing brands:{" "}
+            Comparing competitors for your brand:{" "}
             <span className="font-semibold text-purple-600 animate-pulse">
-              {brands.join(", ")}
-            </span>
+              {brandName}
+            </span>{" "}
             {category && (
               <>
-                {" "}
                 in{" "}
                 <span className="font-semibold text-indigo-600">
                   {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -175,86 +119,78 @@ const ProductSelection = () => {
           </p>
         </div>
 
-        {Object.keys(groupedByBrand).length > 0 ? (
-          <div className="space-y-8 mb-8">
-            {Object.entries(groupedByBrand).map(([brand, products]) => (
-              <div key={brand} className="animate-fadeInUp">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4 px-4 py-2 bg-indigo-50 rounded-lg">
-                  {brand}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {products.map((product) => {
-                    const features = parseFeatures(product.features);
-                    const insights = parseInsights(product.insights);
-
-                    return (
-                      <label
-                        key={product.uniqueId}
-                        className={`flex items-center p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:scale-[1.02] group ${
-                          localSelected.includes(product.uniqueId)
-                            ? "border-purple-500 bg-purple-100 shadow-md"
-                            : "border-gray-200 hover:border-purple-300 bg-white"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={localSelected.includes(product.uniqueId)}
-                          onChange={() => toggleProduct(product)}
-                          className="hidden"
-                        />
-                        <div className="flex items-center w-full">
-                          <div
-                            className={`w-6 h-6 flex items-center justify-center mr-4 border-2 rounded-md transition-all ${
-                              localSelected.includes(product.uniqueId)
-                                ? "bg-purple-500 border-purple-500 scale-110"
-                                : "border-gray-400 hover:border-purple-300"
-                            }`}
-                          >
-                            {localSelected.includes(product.uniqueId) && (
-                              <Lottie
-                                animationData={checkmarkAnimation}
-                                loop={false}
-                                autoplay
-                                className="w-4 h-4"
-                              />
-                            )}
-                          </div>
-                          <div className="flex-1 text-left">
-                            <h3 className="text-lg font-semibold text-gray-800">
-                              {product.model}
-                            </h3>
-                            <div className="text-sm text-gray-600 mt-1">
-                              <span className="font-medium">Features:</span>{" "}
-                              {Object.keys(features).join(", ").slice(0, 50) ||
-                                "N/A"}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              <span className="font-medium">Market Share:</span>{" "}
-                              {insights.marketShare || "N/A"}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              <span className="font-medium">Price Trend:</span>{" "}
-                              {insights.priceTrend || "N/A"}
-                            </div>
-                          </div>
-                          <Lottie
-                            animationData={sparkleAnimation}
-                            loop
-                            autoplay
-                            className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          />
-                        </div>
-                      </label>
-                    );
-                  })}
+        {competitorBrands && competitorBrands.length > 0 ? (
+          // Updated grid container for 2 competitors per row
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            {competitorBrands.map((competitor) => (
+              <label
+                key={competitor.id}
+                className={`flex flex-col p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:scale-[1.02] group ${
+                  localSelected.includes(competitor.id)
+                    ? "border-purple-500 bg-purple-100 shadow-md"
+                    : "border-gray-200 hover:border-purple-300 bg-white"
+                }`}
+              >
+                <div className="flex items-center mb-2">
+                  <div
+                    className={`w-6 h-6 flex items-center justify-center mr-4 border-2 rounded-md transition-all ${
+                      localSelected.includes(competitor.id)
+                        ? "bg-purple-500 border-purple-500 scale-110"
+                        : "border-gray-400 hover:border-purple-300"
+                    }`}
+                  >
+                    {localSelected.includes(competitor.id) && (
+                      <Lottie
+                        animationData={checkmarkAnimation}
+                        loop={false}
+                        autoplay
+                        className="w-4 h-4"
+                      />
+                    )}
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    {competitor.competitorName}
+                  </h3>
                 </div>
-              </div>
+                <div className="text-sm text-gray-600">
+                  <div>
+                    <span className="font-medium">Founded:</span>{" "}
+                    {competitor.founded || "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">Headquarters:</span>{" "}
+                    {competitor.headquarters || "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">Industry:</span>{" "}
+                    {competitor.industry || "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">Revenue:</span>{" "}
+                    {competitor.revenue || "N/A"}
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <Lottie
+                    animationData={sparkleAnimation}
+                    loop
+                    autoplay
+                    className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  />
+                </div>
+                <input
+                  type="checkbox"
+                  checked={localSelected.includes(competitor.id)}
+                  onChange={() => toggleCompetitor(competitor)}
+                  className="hidden"
+                />
+              </label>
             ))}
           </div>
         ) : (
           <div className="animate-fadeInUp text-center p-6 bg-purple-50 rounded-lg border border-purple-200">
             <p className="text-gray-700">
-              No products found for {brands.join(", ")} in {category} category
+              No competitors found for your brand in the {category} category.
             </p>
           </div>
         )}
@@ -269,7 +205,7 @@ const ProductSelection = () => {
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
           >
-            Compare Selected Products
+            Compare Selected Competitors
           </button>
         </div>
       </div>
@@ -277,4 +213,4 @@ const ProductSelection = () => {
   );
 };
 
-export default ProductSelection;
+export default CompetitorSelection;

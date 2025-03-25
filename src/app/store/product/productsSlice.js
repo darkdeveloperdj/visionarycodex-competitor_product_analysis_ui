@@ -7,10 +7,14 @@ const productsSlice = createSlice({
     error: null,
     categoryName: "",
     brandName: "",
+
     competitorBrands: [],
+    selectedCompetitorBrands: [],
+
     competitorProducts: [],
     competitorProductsDetails: [],
     selectedProducts: [],
+
     categoryList: [],
   },
   reducers: {
@@ -77,6 +81,11 @@ const productsSlice = createSlice({
       state.error = action.payload;
     },
 
+    // Selected Competitor Brands
+    setSelectedCompetitorBrands: (state, action) => {
+      state.selectedCompetitorBrands = action.payload;
+    },
+
     // Category List fetch
     fetchCategoryListRequest: (state) => {
       state.loading = true;
@@ -108,6 +117,7 @@ export const {
   sendSelectedProductsRequest,
   sendSelectedProductsSuccess,
   sendSelectedProductsFailure,
+  setSelectedCompetitorBrands,
   fetchCategoryListRequest,
   fetchCategoryListSuccess,
   fetchCategoryListFailure,
