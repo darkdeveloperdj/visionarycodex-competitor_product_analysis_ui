@@ -549,8 +549,8 @@ const CompetitorResults = () => {
 
   if (loading && competitorProducts.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50 relative">
-        <div className="absolute inset-0 bg-white opacity-60"></div>
+      <div className="min-h-screen flex items-center justify-center bg-white relative">
+        <div className="absolute inset-0 bg-white opacity-80"></div>
         <div className="z-10 flex flex-col items-center">
           <Lottie
             animationData={sparklesAnimation}
@@ -568,7 +568,7 @@ const CompetitorResults = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-50 text-gray-800 p-8 flex flex-col font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-white text-gray-800 p-8 flex flex-col font-sans relative overflow-hidden">
       <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
         <Lottie
           animationData={sparklesAnimation}
