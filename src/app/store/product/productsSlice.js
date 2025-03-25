@@ -13,7 +13,7 @@ const productsSlice = createSlice({
 
     competitorProducts: [],
     competitorProductsDetails: [],
-    selectedProducts: [],
+    selectedProducts: [], //legacy
 
     categoryList: [],
   },

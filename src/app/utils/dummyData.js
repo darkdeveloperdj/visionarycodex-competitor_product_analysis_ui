@@ -78,6 +78,7 @@ export const fetchCompetitorProductsDummy = () => ({
       id: 1,
       competitorName: "Apple",
       isMyCompanyProduct: false,
+      model: "iPhone 15 Plus",
       features: {
         chip: "A16 Bionic Chip",
         display: "Super Retina XDR Display",
@@ -101,17 +102,34 @@ export const fetchCompetitorProductsDummy = () => ({
         demand: "Extreme",
         marketShare: "30%",
       },
-      model: "iPhone 15 Plus",
       reviews: {
         user: "AppleFan123",
         comment: "Best iPhone yet",
         date: "2024-03-18",
+      },
+      details: {
+        price: 1099,
+        userRating: "4.8/5",
+        numberOfReviews: 1200,
+        specialFeatures:
+          "Face ID, Ceramic Shield, Wireless Charging, Super Retina XDR Display",
+        reviewSentiment: {
+          positive: "70%",
+          neutral: "20%",
+          negative: "10%",
+        },
+        featureImportance: {
+          price: 0.8,
+          userRating: 0.9,
+          specialFeatures: 0.85,
+        },
       },
     },
     {
       id: 2,
       competitorName: "Samsung",
       isMyCompanyProduct: false,
+      model: "Galaxy S23 Ultra",
       features: {
         chip: "Exynos 2200",
         display: "Dynamic AMOLED 2X",
@@ -135,17 +153,34 @@ export const fetchCompetitorProductsDummy = () => ({
         demand: "High",
         marketShare: "25%",
       },
-      model: "Galaxy S23 Ultra",
       reviews: {
         user: "SamsungGuru",
         comment: "Impressive performance and display",
         date: "2024-04-05",
+      },
+      details: {
+        price: 999,
+        userRating: "4.6/5",
+        numberOfReviews: 950,
+        specialFeatures:
+          "Fingerprint Sensor, Gorilla Glass Victus, Wireless Charging, Dynamic AMOLED 2X, Bixby",
+        reviewSentiment: {
+          positive: "65%",
+          neutral: "25%",
+          negative: "10%",
+        },
+        featureImportance: {
+          price: 0.8,
+          userRating: 0.9,
+          specialFeatures: 0.85,
+        },
       },
     },
     {
       id: 3,
       competitorName: "Google",
       isMyCompanyProduct: false,
+      model: "Pixel 8 Pro",
       features: {
         chip: "Tensor G3 Chip",
         display: "Smooth OLED Display",
@@ -169,17 +204,34 @@ export const fetchCompetitorProductsDummy = () => ({
         demand: "Moderate",
         marketShare: "15%",
       },
-      model: "Pixel 8 Pro",
       reviews: {
         user: "PixelLover",
         comment: "Great camera and clean Android experience",
         date: "2024-02-28",
+      },
+      details: {
+        price: 799,
+        userRating: "4.5/5",
+        numberOfReviews: 700,
+        specialFeatures:
+          "In-display Fingerprint, Smooth OLED Display, Google Assistant",
+        reviewSentiment: {
+          positive: "60%",
+          neutral: "30%",
+          negative: "10%",
+        },
+        featureImportance: {
+          price: 0.75,
+          userRating: 0.85,
+          specialFeatures: 0.8,
+        },
       },
     },
     {
       id: 4,
       competitorName: "Xiaomi",
       isMyCompanyProduct: false,
+      model: "Redmi Note 12 Pro",
       features: {
         chip: "Snapdragon 732G",
         display: "AMOLED Display",
@@ -194,7 +246,7 @@ export const fetchCompetitorProductsDummy = () => ({
         nfc: true,
         dualSim: true,
         assistant: "MIUI Assistant",
-        batteryLife: "10 hours",
+        batteryLife: "12 hours",
         weight: "1.2 kg",
       },
       insights: {
@@ -203,17 +255,34 @@ export const fetchCompetitorProductsDummy = () => ({
         demand: "High",
         marketShare: "10%",
       },
-      model: "Redmi Note 12 Pro",
       reviews: {
         user: "XiaomiFan",
         comment: "Great value for money",
         date: "2024-03-10",
+      },
+      details: {
+        price: 349,
+        userRating: "4.4/5",
+        numberOfReviews: 800,
+        specialFeatures:
+          "AMOLED Display, Gorilla Glass 5, Fingerprint Sensor, 5000mAh Battery",
+        reviewSentiment: {
+          positive: "60%",
+          neutral: "30%",
+          negative: "10%",
+        },
+        featureImportance: {
+          price: 0.7,
+          userRating: 0.8,
+          specialFeatures: 0.75,
+        },
       },
     },
     {
       id: 5,
       competitorName: "OnePlus",
       isMyCompanyProduct: false,
+      model: "OnePlus 11",
       features: {
         chip: "Snapdragon 8 Gen 2",
         display: "Fluid AMOLED Display",
@@ -228,8 +297,8 @@ export const fetchCompetitorProductsDummy = () => ({
         nfc: true,
         dualSim: true,
         assistant: "OnePlus Assistant",
-        batteryLife: "10 hours",
-        weight: "1.2 kg",
+        batteryLife: "11 hours",
+        weight: "1.15 kg",
       },
       insights: {
         popularity: "High",
@@ -237,122 +306,184 @@ export const fetchCompetitorProductsDummy = () => ({
         demand: "Moderate",
         marketShare: "8%",
       },
-      model: "OnePlus 11",
       reviews: {
         user: "OnePlusUser",
         comment: "Smooth performance and clean software",
         date: "2024-03-22",
       },
+      details: {
+        price: 699,
+        userRating: "4.5/5",
+        numberOfReviews: 900,
+        specialFeatures:
+          "Fluid AMOLED Display, In-display Fingerprint, Gorilla Glass Victus, Fast Charging",
+        reviewSentiment: {
+          positive: "67%",
+          neutral: "25%",
+          negative: "8%",
+        },
+        featureImportance: {
+          price: 0.75,
+          userRating: 0.85,
+          specialFeatures: 0.8,
+        },
+      },
+    },
+    {
+      id: 6,
+      competitorName: "TechNova",
+      isMyCompanyProduct: true,
+      model: "Nova Pro X",
+      features: {
+        chip: "NovaChip Pro",
+        display: "Quantum OLED",
+        protection: "Titanium Shield",
+        battery: "5000mAh Fast Charge Battery",
+        waterResistance: true,
+        wirelessCharging: true,
+        security: "NovaSecure ID",
+        bluetooth: true,
+        wifi: true,
+        gps: true,
+        nfc: true,
+        dualSim: true,
+        assistant: "Nova Assistant Pro",
+        batteryLife: "12 hours",
+        weight: "1.1 kg",
+      },
+      insights: {
+        popularity: "Very High",
+        priceTrend: "Rising",
+        demand: "High",
+        marketShare: "40%",
+      },
+      reviews: {
+        user: "TechNovaLover",
+        comment: "Innovative design and performance",
+        date: "2024-04-10",
+      },
+      details: {
+        price: 799,
+        userRating: "4.7/5",
+        numberOfReviews: 1100,
+        specialFeatures: "Quantum OLED, Titanium Shield, Fast Charging",
+        reviewSentiment: {
+          positive: "72%",
+          neutral: "20%",
+          negative: "8%",
+        },
+        featureImportance: {
+          price: 0.85,
+          userRating: 0.9,
+          specialFeatures: 0.88,
+        },
+      },
+    },
+    {
+      id: 7,
+      competitorName: "TechNova",
+      isMyCompanyProduct: true,
+      model: "Nova Edge",
+      features: {
+        chip: "NovaChip Edge",
+        display: "Infinity AMOLED",
+        protection: "Reinforced Glass",
+        battery: "4800mAh Battery",
+        waterResistance: true,
+        wirelessCharging: true,
+        security: "Edge Secure ID",
+        bluetooth: true,
+        wifi: true,
+        gps: true,
+        nfc: true,
+        dualSim: true,
+        assistant: "Nova Edge Assistant",
+        batteryLife: "11 hours",
+        weight: "1.05 kg",
+      },
+      insights: {
+        popularity: "High",
+        priceTrend: "Stable",
+        demand: "Moderate",
+        marketShare: "35%",
+      },
+      reviews: {
+        user: "EdgeFan",
+        comment: "Sleek design and reliable performance",
+        date: "2024-04-08",
+      },
+      details: {
+        price: 699,
+        userRating: "4.6/5",
+        numberOfReviews: 950,
+        specialFeatures:
+          "Infinity AMOLED, Reinforced Glass, Fast Wireless Charging",
+        reviewSentiment: {
+          positive: "70%",
+          neutral: "25%",
+          negative: "5%",
+        },
+        featureImportance: {
+          price: 0.8,
+          userRating: 0.85,
+          specialFeatures: 0.82,
+        },
+      },
+    },
+    {
+      id: 8,
+      competitorName: "TechNova",
+      isMyCompanyProduct: true,
+      model: "Nova Max",
+      features: {
+        chip: "NovaChip Max",
+        display: "UltraCrystal Display",
+        protection: "Carbon Fiber Shield",
+        battery: "5500mAh Ultra Battery",
+        waterResistance: true,
+        wirelessCharging: true,
+        security: "Max Secure ID",
+        bluetooth: true,
+        wifi: true,
+        gps: true,
+        nfc: true,
+        dualSim: true,
+        assistant: "Nova Max Voice",
+        batteryLife: "13 hours",
+        weight: "1.2 kg",
+      },
+      insights: {
+        popularity: "Moderate",
+        priceTrend: "Falling",
+        demand: "High",
+        marketShare: "38%",
+      },
+      reviews: {
+        user: "MaxUser",
+        comment: "Outstanding battery life and display quality",
+        date: "2024-04-09",
+      },
+      details: {
+        price: 899,
+        userRating: "4.8/5",
+        numberOfReviews: 1200,
+        specialFeatures:
+          "UltraCrystal Display, Carbon Fiber Shield, Ultra Battery",
+        reviewSentiment: {
+          positive: "75%",
+          neutral: "20%",
+          negative: "5%",
+        },
+        featureImportance: {
+          price: 0.9,
+          userRating: 0.92,
+          specialFeatures: 0.88,
+        },
+      },
     },
   ],
 });
 
-export const fetchSelectedCompetitorProductsDetailsDummy = () => ({
-  success: true,
-  message: "Dummy submission successful",
-  details: [
-    {
-      id: 1,
-      model: "iPhone 15 Plus",
-      name: "Apple iPhone 15 Plus",
-      price: 1099,
-      userRating: "4.8/5",
-      numberOfReviews: 1200,
-      specialFeatures:
-        "Face ID, Ceramic Shield, Wireless Charging, Super Retina XDR Display",
-      reviewSentiment: {
-        positive: "70%",
-        neutral: "20%",
-        negative: "10%",
-      },
-      featureImportance: {
-        price: 0.8,
-        userRating: 0.9,
-        specialFeatures: 0.85,
-      },
-    },
-    {
-      id: 2,
-      model: "Galaxy S23 Ultra",
-      name: "Samsung Galaxy S23 Ultra",
-      price: 999,
-      userRating: "4.6/5",
-      numberOfReviews: 950,
-      specialFeatures:
-        "Fingerprint Sensor, Gorilla Glass Victus, Wireless Charging, Dynamic AMOLED 2X, Bixby",
-      reviewSentiment: {
-        positive: "65%",
-        neutral: "25%",
-        negative: "10%",
-      },
-      featureImportance: {
-        price: 0.8,
-        userRating: 0.9,
-        specialFeatures: 0.85,
-      },
-    },
-    {
-      id: 3,
-      model: "Pixel 8 Pro",
-      name: "Google Pixel 8 Pro",
-      price: 899,
-      userRating: "4.5/5",
-      numberOfReviews: 1200,
-      specialFeatures:
-        "In-display Fingerprint, Gorilla Glass, Wireless Charging, Smooth OLED Display, Google Assistant",
-      reviewSentiment: {
-        positive: "70%",
-        neutral: "20%",
-        negative: "10%",
-      },
-      featureImportance: {
-        price: 0.8,
-        userRating: 0.9,
-        specialFeatures: 0.85,
-      },
-    },
-    {
-      id: 4,
-      model: "Redmi Note 12 Pro",
-      name: "Xiaomi Redmi Note 12 Pro",
-      price: 299,
-      userRating: "4.2/5",
-      numberOfReviews: 1100,
-      specialFeatures:
-        "Fingerprint Sensor, AMOLED Display, Large Battery, Gorilla Glass 5, MIUI Assistant",
-      reviewSentiment: {
-        positive: "65%",
-        neutral: "25%",
-        negative: "10%",
-      },
-      featureImportance: {
-        price: 0.8,
-        userRating: 0.9,
-        specialFeatures: 0.85,
-      },
-    },
-    {
-      id: 5,
-      model: "OnePlus 11",
-      name: "OnePlus 11",
-      price: 699,
-      userRating: "4.4/5",
-      numberOfReviews: 1300,
-      specialFeatures:
-        "In-display Fingerprint, Gorilla Glass Victus, Wireless Charging, Fluid AMOLED Display, OnePlus Assistant",
-      reviewSentiment: {
-        positive: "70%",
-        neutral: "20%",
-        negative: "10%",
-      },
-      featureImportance: {
-        price: 0.8,
-        userRating: 0.9,
-        specialFeatures: 0.85,
-      },
-    },
-  ],
-});
 /**
  * COMPETITIVE ANALYSIS DATABASE SCHEMA v1
  */

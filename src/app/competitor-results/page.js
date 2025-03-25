@@ -11,8 +11,8 @@ import {
   Legend,
 } from "chart.js";
 import {
-  setSelectedProducts,
   sendSelectedProductsRequest,
+  fetchCompetitorProductsRequest,
 } from "../store/product/productsSlice";
 import Lottie from "lottie-react";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
@@ -30,7 +30,6 @@ ChartJS.register(
 const StarRating = ({ rating }) => {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
-
   return (
     <div className="flex">
       {[...Array(5)].map((_, index) => (
@@ -48,60 +47,62 @@ const StarRating = ({ rating }) => {
   );
 };
 
-const parseInvalidJson = (str) => {
-  try {
-    const validJson = str
-      .replace(/"/g, '\\"') // Escape existing double quotes first
-      .replace(/'/g, '"') // Replace single quotes with double quotes
-      .replace(/\bTrue\b/g, "true")
-      .replace(/\bFalse\b/g, "false");
-    return JSON.parse(validJson);
-  } catch (error) {
-    console.error("Failed to parse JSON string:", str, error);
-    return {};
-  }
-};
-
 const CompetitorResults = () => {
   const dispatch = useDispatch();
   const {
+    loading,
+    error,
     categoryName,
     brandName,
-    allProducts: apiProducts,
-    myCompanyAllProducts: myCompanyProducts,
+    competitorBrands,
+    selectedCompetitorBrands,
+    competitorProducts,
+    competitorProductsDetails,
     selectedProducts,
+    categoryList,
   } = useSelector((state) => state.products);
 
-  const [selectedCompanyProducts, setSelectedCompanyProducts] = useState([]);
-  const [selectedFeatures, setSelectedFeatures] = useState([]);
+  // Group products based on isMyCompanyProduct flag
+  const myProducts = useMemo(
+    () => competitorProducts.filter((p) => p.isMyCompanyProduct),
+    [competitorProducts]
+  );
+  const competitorItems = useMemo(
+    () => competitorProducts.filter((p) => !p.isMyCompanyProduct),
+    [competitorProducts]
+  );
+
+  // Local state to manage active filters based on product model names
   const [activeFilters, setActiveFilters] = useState(new Set());
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
   const [mounted, setMounted] = useState(false);
   const [lastSentFilters, setLastSentFilters] = useState(null);
-  const { matrixData } = useSelector((state) => state.products);
-  const [iframeKey, setIframeKey] = useState(0);
 
   const query = categoryName || "Products";
   const category = categoryName ? categoryName.toLowerCase() : "electronics";
-  const brandList = brandName
-    ? brandName.split(",").map((brand) => brand.trim())
-    : [];
 
-  const allSelectedProducts = useMemo(
-    () => [...selectedProducts, ...selectedCompanyProducts],
-    [selectedProducts, selectedCompanyProducts]
-  );
+  // Dispatch API call for competitor products when selected competitor brands change
+  useEffect(() => {
+    if (selectedCompetitorBrands && selectedCompetitorBrands.length > 0) {
+      dispatch(
+        fetchCompetitorProductsRequest({
+          category_name: category,
+          brand_name: brandName,
+          selected_competitor_names: selectedCompetitorBrands,
+        })
+      );
+    }
+  }, [dispatch, selectedCompetitorBrands, category, brandName]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Initialize active filters on mount
+  // Initialize active filters based on all available products
   useEffect(() => {
-    const initialModels = [...selectedProducts, ...selectedCompanyProducts].map(
-      (product) => product.model
-    );
-    setActiveFilters(new Set(initialModels));
-  }, []); // Empty dependency array ensures this runs only once on mount
+    const allModels = competitorProducts.map((p) => p.model);
+    setActiveFilters(new Set(allModels));
+  }, [competitorProducts]);
 
   useEffect(() => {
     const currentFilters = Array.from(activeFilters);
@@ -113,35 +114,17 @@ const CompetitorResults = () => {
     }
   }, [dispatch, activeFilters, lastSentFilters]);
 
-  useEffect(() => {
-    if (matrixData?.message === "Products updated successfully") {
-      setIframeKey((prev) => prev + 1);
-    }
-  }, [matrixData?.message]);
-
-  const filteredProducts = useMemo(
-    () => apiProducts.filter((product) => product.category === category),
-    [apiProducts, category]
-  );
-
   const allFeatures = useMemo(() => {
     const featuresSet = new Set();
-
-    filteredProducts.forEach((product) => {
-      const features = parseInvalidJson(product.features);
+    competitorProducts.forEach((product) => {
+      const features = product.features || {};
       Object.keys(features).forEach((f) => featuresSet.add(f));
     });
-
-    myCompanyProducts.flat().forEach((product) => {
-      const features = parseInvalidJson(product.features);
-      Object.keys(features).forEach((f) => featuresSet.add(f));
-    });
-
     return Array.from(featuresSet);
-  }, [filteredProducts]);
+  }, [competitorProducts]);
 
+  // Updated toggle function - now toggles for all products, including my products.
   const toggleActiveFilter = (product) => {
-    if (product.brand === "TechNova") return;
     setActiveFilters((prev) => {
       const newSet = new Set(prev);
       newSet.has(product.model)
@@ -160,33 +143,15 @@ const CompetitorResults = () => {
   };
 
   const handleResetFilters = () => {
+    const allModels = competitorProducts.map((p) => p.model);
     setSelectedFeatures([]);
-    setSelectedCompanyProducts([]); // Add this line
-    setActiveFilters(new Set(allSelectedProducts.map((p) => p.model)));
-  };
-
-  // Update handleCompanyProductToggle to manage activeFilters
-  const handleCompanyProductToggle = (product) => {
-    setSelectedCompanyProducts((prev) => {
-      const newSelected = prev.some((p) => p.model === product.model)
-        ? prev.filter((p) => p.model !== product.model)
-        : [...prev, product];
-      // Sync active filters
-      setActiveFilters((prevFilters) => {
-        const newFilters = new Set(prevFilters);
-        newSelected.some((p) => p.model === product.model)
-          ? newFilters.add(product.model)
-          : newFilters.delete(product.model);
-        return newFilters;
-      });
-      return newSelected;
-    });
+    setActiveFilters(new Set(allModels));
   };
 
   const activeSelectedProducts = useMemo(
     () =>
-      allSelectedProducts.filter((product) => activeFilters.has(product.model)),
-    [allSelectedProducts, activeFilters]
+      competitorProducts.filter((product) => activeFilters.has(product.model)),
+    [competitorProducts, activeFilters]
   );
 
   return (
@@ -213,85 +178,94 @@ const CompetitorResults = () => {
             🔍 Comparison Filters
           </h2>
 
-          {/* Company Products Filter */}
+          {/* My Products Filter */}
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-gray-700">
               🏢 My Products
             </h3>
             <div className="space-y-2">
-              {myCompanyProducts.flat().map((product) => (
-                <label
-                  key={product.model}
-                  className="flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 hover:bg-gray-50 border border-gray-200"
-                >
-                  <input
-                    type="checkbox"
-                    className="form-checkbox h-4 w-4 text-purple-500"
-                    checked={selectedCompanyProducts.some(
-                      (p) => p.model === product.model
-                    )}
-                    onChange={() => handleCompanyProductToggle(product)}
-                  />
-                  <span className="ml-3 text-sm text-gray-700">
-                    {product.model}
-                  </span>
-                </label>
-              ))}
+              {myProducts.length > 0 ? (
+                myProducts.map((product) => (
+                  <label
+                    key={product.model}
+                    className="flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 hover:bg-gray-50 border border-gray-200"
+                  >
+                    <input
+                      type="checkbox"
+                      className="form-checkbox h-4 w-4 text-purple-500"
+                      checked={activeFilters.has(product.model)}
+                      onChange={() => toggleActiveFilter(product)}
+                    />
+                    <span className="ml-3 text-sm text-gray-700">
+                      {product.model}
+                    </span>
+                  </label>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No products available.</p>
+              )}
             </div>
           </div>
 
-          {/* Selected Products Filter */}
+          {/* Competitor Products Filter */}
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-gray-700">
-              📦 Selected Products
+              📦 Competitor Products
             </h3>
             <div className="space-y-2">
-              {selectedProducts.map((product) => (
-                <label
-                  key={product.model}
-                  className="flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 hover:bg-gray-50 border border-gray-200"
-                >
-                  <input
-                    type="checkbox"
-                    className="form-checkbox h-4 w-4 text-purple-500"
-                    checked={activeFilters.has(product.model)}
-                    onChange={() => toggleActiveFilter(product)}
-                    disabled={product.brand === "TechNova"}
-                  />
-                  <span className="ml-3 text-sm text-gray-700">
-                    {product.model}
-                  </span>
-                </label>
-              ))}
+              {competitorItems.length > 0 ? (
+                competitorItems.map((product) => (
+                  <label
+                    key={product.model}
+                    className="flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 hover:bg-gray-50 border border-gray-200"
+                  >
+                    <input
+                      type="checkbox"
+                      className="form-checkbox h-4 w-4 text-purple-500"
+                      checked={activeFilters.has(product.model)}
+                      onChange={() => toggleActiveFilter(product)}
+                    />
+                    <span className="ml-3 text-sm text-gray-700">
+                      {product.model}
+                    </span>
+                  </label>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No products available.</p>
+              )}
             </div>
           </div>
 
-          {/* Feature Filter */}
+          {/* Features Filter */}
           <div className="mb-8">
             <h3 className="font-semibold mb-4 text-lg text-gray-700">
               ⚙️ Features
             </h3>
             <div className="space-y-2">
-              {allFeatures.map((feature) => (
-                <label
-                  key={feature}
-                  className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
-                    selectedFeatures.includes(feature)
-                      ? "bg-purple-100 border-purple-300 shadow-md scale-[1.02]"
-                      : "hover:bg-gray-50 border-gray-200 hover:scale-[1.01]"
-                  } border`}
-                >
-                  <input
-                    type="checkbox"
-                    className="form-checkbox h-4 w-4 text-purple-500"
-                    checked={selectedFeatures.includes(feature)}
-                    onChange={() => toggleFeatureSelection(feature)}
-                  />
-                  <span className="ml-3 text-sm capitalize text-gray-700">
-                    {feature}
-                  </span>
-                </label>
-              ))}
+              {allFeatures.length > 0 ? (
+                allFeatures.map((feature) => (
+                  <label
+                    key={feature}
+                    className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
+                      selectedFeatures.includes(feature)
+                        ? "bg-purple-100 border-purple-300 shadow-md scale-[1.02]"
+                        : "hover:bg-gray-50 border-gray-200 hover:scale-[1.01]"
+                    } border`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="form-checkbox h-4 w-4 text-purple-500"
+                      checked={selectedFeatures.includes(feature)}
+                      onChange={() => toggleFeatureSelection(feature)}
+                    />
+                    <span className="ml-3 text-sm capitalize text-gray-700">
+                      {feature}
+                    </span>
+                  </label>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No features available.</p>
+              )}
             </div>
           </div>
 
@@ -337,7 +311,7 @@ const CompetitorResults = () => {
                 </thead>
                 <tbody>
                   {activeSelectedProducts.map((product, index) => {
-                    const features = parseInvalidJson(product.features);
+                    const features = product.features || {};
                     return (
                       <tr
                         key={index}
@@ -347,11 +321,15 @@ const CompetitorResults = () => {
                       >
                         <td className="p-4 text-sm font-medium text-gray-700">
                           <div className="flex items-center gap-2">
-                            {product.brand}
-                            {product.brand === "TechNova" && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                Our Product
-                              </span>
+                            {product.isMyCompanyProduct ? (
+                              <>
+                                {product.competitorName}{" "}
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                  Our Product
+                                </span>
+                              </>
+                            ) : (
+                              product.competitorName
                             )}
                           </div>
                         </td>
@@ -381,7 +359,7 @@ const CompetitorResults = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {activeSelectedProducts.map((product) => {
-                const insights = parseInvalidJson(product.insights);
+                const insights = product.insights || {};
                 return (
                   <div
                     key={product.model}
@@ -392,7 +370,7 @@ const CompetitorResults = () => {
                         {product.model}
                       </h4>
                       <span className="text-sm text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
-                        {product.brand}
+                        {product.competitorName}
                       </span>
                     </div>
                     <div className="space-y-3">
@@ -458,16 +436,7 @@ const CompetitorResults = () => {
             <h3 className="text-2xl font-bold mb-6 text-gray-700">
               📊 Analysis Report
             </h3>
-            <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
-              <iframe
-                key={iframeKey}
-                className="w-full h-[450px] md:h-[600px]"
-                src="https://lookerstudio.google.com/embed/reporting/100436a2-d3ff-410d-9318-8696fa4a79a1/page/gxYEF"
-                frameBorder="0"
-                allowFullScreen
-                sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-              ></iframe>
-            </div>
+            <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-lg"></div>
           </div>
 
           {/* Customer Reviews */}
@@ -477,12 +446,17 @@ const CompetitorResults = () => {
             </h3>
             <div className="space-y-6">
               {activeSelectedProducts.map((product) => {
-                const reviews = parseInvalidJson(product.reviews);
-                const avgRating = reviews?.length
-                  ? reviews.reduce((sum, review) => sum + review.rating, 0) /
-                    reviews.length
-                  : 0;
-
+                let reviews = product.reviews;
+                if (reviews && !Array.isArray(reviews)) {
+                  reviews = [reviews];
+                }
+                const avgRating =
+                  reviews && reviews.length
+                    ? reviews.reduce(
+                        (sum, review) => sum + (review.rating || 0),
+                        0
+                      ) / reviews.length
+                    : 0;
                 return (
                   <div
                     key={product.model}
