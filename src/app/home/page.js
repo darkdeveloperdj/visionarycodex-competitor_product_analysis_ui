@@ -1,22 +1,24 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Lottie from "lottie-react";
 import analyticsAnimation from "../../../public/assets/animations/analytics-animation.json";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/HomePage.css";
 import { useDispatch, useSelector } from "react-redux";
-import { setCategoryName, setBrandName } from "../store/product/productsSlice";
-import { fetchCategoryListRequest } from "../store/product/productsSlice";
+import {
+  setCategoryName,
+  setBrandName,
+  fetchCategoryListRequest,
+} from "../store/product/productsSlice";
 
-// Helper function to capitalize each word
-const formatText = (input) => {
-  return input
+// Helper function to capitalize every word
+const formatText = (input) =>
+  input
     .trim()
     .split(/\s+/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
-};
 
 const HomePage = () => {
   const router = useRouter();
@@ -29,40 +31,29 @@ const HomePage = () => {
   const [mounted, setMounted] = useState(false);
   const [showCopiedFeedback, setShowCopiedFeedback] = useState(false);
 
-  // On mount, dispatch the fetch for category list and set mounted flag.
+  // On mount, fetch categories and set mounted flag.
   useEffect(() => {
     setMounted(true);
     dispatch(fetchCategoryListRequest());
   }, [dispatch]);
 
-  // Once the categoryList is loaded, set the default selected category (capitalized)
+  // Set default selected category once categories load.
   useEffect(() => {
-    if (categoryList && categoryList.length > 0 && !selectedCategory) {
+    if (categoryList?.length && !selectedCategory) {
       setSelectedCategory(formatText(categoryList[0].categoryName));
     }
   }, [categoryList, selectedCategory]);
 
-  const formatCompanyInput = (input) => {
-    return input
-      .trim()
-      .split(/\s+/)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  };
-
-  const handleInputChange = (value) => {
+  const handleInputChange = useCallback((value) => {
     setQuery(value);
     setShowError(false);
-  };
+  }, []);
 
-  const handleExampleClick = () => {
-    const example = "Apple";
-    setQuery(example);
-  };
+  const handleExampleClick = () => setQuery("Apple");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formattedQuery = formatCompanyInput(query);
+    const formattedQuery = formatText(query);
     if (!formattedQuery) {
       setShowError(true);
       return;
@@ -77,12 +68,10 @@ const HomePage = () => {
       <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
         <Lottie
           animationData={sparklesAnimation}
-          loop={true}
-          autoplay={true}
+          loop
+          autoplay
           className="w-full h-full"
-          rendererSettings={{
-            preserveAspectRatio: "xMidYMid slice",
-          }}
+          rendererSettings={{ preserveAspectRatio: "xMidYMid slice" }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-purple-100/30" />
       </div>
@@ -95,8 +84,8 @@ const HomePage = () => {
         <div className="relative h-48 mb-8 -mt-12">
           <Lottie
             animationData={analyticsAnimation}
-            loop={true}
-            autoplay={true}
+            loop
+            autoplay
             className="h-full w-full"
           />
           <h1 className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl font-extrabold text-center w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
@@ -124,7 +113,7 @@ const HomePage = () => {
                 className="w-full p-4 pl-6 pr-10 text-gray-700 bg-white/95 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none transition-all duration-300 hover:border-purple-400 hover:shadow-md"
                 required
               >
-                {categoryList && categoryList.length > 0 ? (
+                {categoryList?.length ? (
                   categoryList.map((cat) => {
                     const formattedCategory = formatText(cat.categoryName);
                     return (
@@ -172,7 +161,7 @@ const HomePage = () => {
                 placeholder="Example: Apple"
                 value={query}
                 onChange={(e) => handleInputChange(e.target.value)}
-                onBlur={(e) => setQuery(formatCompanyInput(e.target.value))}
+                onBlur={(e) => setQuery(formatText(e.target.value))}
                 className="w-full p-4 pl-12 pr-6 text-gray-700 bg-white/95 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 hover:border-purple-400 hover:shadow-md"
                 required
               />
@@ -265,7 +254,6 @@ const HomePage = () => {
                 Copied!
               </div>
             </div>
-
             <p className="text-gray-400 text-xs mt-1 ml-0.5">
               Click text to autofill or icon to copy
             </p>
@@ -275,8 +263,8 @@ const HomePage = () => {
             <div className="animate-fadeInUp text-center p-4 bg-purple-50 rounded-lg border border-purple-200 hover:scale-[1.01] transition-transform duration-300 relative">
               <Lottie
                 animationData={sparklesAnimation}
-                loop={true}
-                autoplay={true}
+                loop
+                autoplay
                 className="absolute inset-0 w-full h-full opacity-20"
               />
               <p className="text-sm text-gray-700 relative z-10">
@@ -301,8 +289,8 @@ const HomePage = () => {
                 Search and Select Competitor
                 <Lottie
                   animationData={sparklesAnimation}
-                  loop={true}
-                  autoplay={true}
+                  loop
+                  autoplay
                   className="w-8 h-8 ml-3"
                 />
               </span>
