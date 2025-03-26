@@ -94,14 +94,14 @@ const FilterPanel = React.memo(
       initial={{ x: -50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="w-80 p-6 bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200"
+      className="w-80 p-6 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-300 space-y-6"
     >
-      <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+      <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
         🔍 Filters
       </h2>
       {/* My Products */}
-      <div className="mb-8">
-        <h3 className="font-semibold mb-4 text-lg text-gray-700">
+      <div>
+        <h3 className="font-semibold text-lg text-gray-700 mb-2">
           🏢 My Products
         </h3>
         <div className="space-y-2">
@@ -109,7 +109,7 @@ const FilterPanel = React.memo(
             myProducts.map((product) => (
               <label
                 key={product.model}
-                className="flex items-center p-3 rounded-xl transition-transform duration-200 hover:scale-105 border border-gray-200 bg-gray-50"
+                className="flex items-center p-2 rounded-md border border-gray-200 bg-gray-50 hover:scale-105 transition-transform duration-200"
               >
                 <input
                   type="checkbox"
@@ -117,7 +117,7 @@ const FilterPanel = React.memo(
                   checked={activeFilters.has(product.model)}
                   onChange={() => toggleActiveFilter(product)}
                 />
-                <span className="ml-3 text-sm text-gray-800">
+                <span className="ml-2 text-sm text-gray-800">
                   {product.model}
                 </span>
               </label>
@@ -128,8 +128,8 @@ const FilterPanel = React.memo(
         </div>
       </div>
       {/* Competitor Products */}
-      <div className="mb-8">
-        <h3 className="font-semibold mb-4 text-lg text-gray-700">
+      <div>
+        <h3 className="font-semibold text-lg text-gray-700 mb-2">
           📦 Competitor Products
         </h3>
         <div className="space-y-2">
@@ -137,7 +137,7 @@ const FilterPanel = React.memo(
             competitorItems.map((product) => (
               <label
                 key={product.model}
-                className="flex items-center p-3 rounded-xl transition-transform duration-200 hover:scale-105 border border-gray-200 bg-gray-50"
+                className="flex items-center p-2 rounded-md border border-gray-200 bg-gray-50 hover:scale-105 transition-transform duration-200"
               >
                 <input
                   type="checkbox"
@@ -145,7 +145,7 @@ const FilterPanel = React.memo(
                   checked={activeFilters.has(product.model)}
                   onChange={() => toggleActiveFilter(product)}
                 />
-                <span className="ml-3 text-sm text-gray-800">
+                <span className="ml-2 text-sm text-gray-800">
                   {product.model}
                 </span>
               </label>
@@ -156,8 +156,8 @@ const FilterPanel = React.memo(
         </div>
       </div>
       {/* Features */}
-      <div className="mb-8">
-        <h3 className="font-semibold mb-4 text-lg text-gray-700">
+      <div>
+        <h3 className="font-semibold text-lg text-gray-700 mb-2">
           ⚙️ Features
         </h3>
         <div className="space-y-2">
@@ -165,11 +165,11 @@ const FilterPanel = React.memo(
             allFeatures.map((feature) => (
               <label
                 key={feature}
-                className={`flex items-center p-3 rounded-xl transition-transform duration-200 ${
+                className={`flex items-center p-2 rounded-md border ${
                   selectedFeatures.includes(feature)
                     ? "bg-indigo-100 border-indigo-300 shadow-md scale-105"
                     : "bg-gray-50 border-gray-200 hover:scale-105"
-                } border`}
+                } transition-transform duration-200`}
               >
                 <input
                   type="checkbox"
@@ -177,7 +177,7 @@ const FilterPanel = React.memo(
                   checked={selectedFeatures.includes(feature)}
                   onChange={() => toggleFeatureSelection(feature)}
                 />
-                <span className="ml-3 text-sm capitalize text-gray-800">
+                <span className="ml-2 text-sm capitalize text-gray-800">
                   {feature}
                 </span>
               </label>
@@ -189,7 +189,7 @@ const FilterPanel = React.memo(
       </div>
       <button
         onClick={handleResetFilters}
-        className="w-full py-3 mt-4 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-xl font-semibold transition-transform duration-300 hover:scale-105 shadow-lg"
+        className="w-full py-2 mt-4 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-md font-semibold transition-transform duration-300 hover:scale-105 shadow-md"
       >
         🔄 Reset Filters
       </button>
@@ -205,26 +205,26 @@ const FeatureComparisonTable = React.memo(
       transition={{ duration: 0.6, delay: 0.1 }}
       className="mb-12"
     >
-      <h3 className="text-2xl font-bold mb-6 text-gray-800">
+      <h3 className="text-2xl font-bold text-gray-800 mb-4">
         📜 Feature Matrix
       </h3>
-      <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-lg">
+      <div className="overflow-x-auto rounded-2xl border border-gray-300 shadow-md">
         <table className="w-full">
           <thead className="bg-gradient-to-r from-indigo-100 to-purple-100">
             <tr>
-              <th className="p-4 text-left font-semibold text-gray-700">
+              <th className="p-3 text-left font-semibold text-gray-700">
                 Thumbnail
               </th>
-              <th className="p-4 text-left font-semibold text-gray-700">
+              <th className="p-3 text-left font-semibold text-gray-700">
                 🏭 Brand
               </th>
-              <th className="p-4 text-left font-semibold text-gray-700">
+              <th className="p-3 text-left font-semibold text-gray-700">
                 📛 Model
               </th>
               {selectedFeatures.map((feature) => (
                 <th
                   key={feature}
-                  className="p-4 text-center font-semibold text-gray-700"
+                  className="p-3 text-center font-semibold text-gray-700"
                 >
                   {feature}
                 </th>
@@ -241,7 +241,7 @@ const FeatureComparisonTable = React.memo(
                     index % 2 === 0 ? "bg-gray-50" : "bg-white"
                   } hover:bg-gray-100 transition-colors`}
                 >
-                  <td className="p-4 text-center">
+                  <td className="p-3 text-center">
                     {features.thumbnail ? (
                       <img
                         src={features.thumbnail}
@@ -252,7 +252,7 @@ const FeatureComparisonTable = React.memo(
                       "N/A"
                     )}
                   </td>
-                  <td className="p-4 text-sm font-medium text-gray-800">
+                  <td className="p-3 text-sm font-medium text-gray-800">
                     <div className="flex items-center gap-2">
                       {product.isMyCompanyProduct ? (
                         <>
@@ -266,9 +266,9 @@ const FeatureComparisonTable = React.memo(
                       )}
                     </div>
                   </td>
-                  <td className="p-4 text-sm text-gray-600">{product.model}</td>
+                  <td className="p-3 text-sm text-gray-600">{product.model}</td>
                   {selectedFeatures.map((feature) => (
-                    <td key={feature} className="p-4 text-center text-2xl">
+                    <td key={feature} className="p-3 text-center text-2xl">
                       {features[feature] ? "✅" : "❌"}
                     </td>
                   ))}
@@ -289,18 +289,18 @@ const MarketInsightsPanel = React.memo(({ activeSelectedProducts }) => (
     transition={{ duration: 0.6, delay: 0.2 }}
     className="mb-12"
   >
-    <h3 className="text-2xl font-bold mb-6 text-gray-800">
+    <h3 className="text-2xl font-bold text-gray-800 mb-4">
       💡 Market Insights
     </h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {activeSelectedProducts.map((product) => {
         const insights = product.insights || {};
         return (
           <div
             key={product.model}
-            className="bg-white p-6 rounded-2xl border border-gray-200 hover:shadow-xl transition-shadow"
+            className="bg-white p-6 rounded-2xl border border-gray-300 hover:shadow-lg transition-shadow space-y-3"
           >
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center">
               <h4 className="text-lg font-semibold text-gray-800">
                 {product.model}
               </h4>
@@ -310,45 +310,33 @@ const MarketInsightsPanel = React.memo(({ activeSelectedProducts }) => (
             </div>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">🚀 Popularity</span>
-                <span
-                  className={`text-sm font-medium ${
-                    insights.popularity === "High" ||
-                    insights.popularity === "Very High"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {insights.popularity}
+                <span className="w-1/3 text-sm text-gray-600">
+                  🚀 Popularity
+                </span>
+                <span className="w-2/3 text-sm font-medium text-green-600 text-right">
+                  {insights.popularity || "N/A"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">💰 Price Trend</span>
-                <span
-                  className={`text-sm font-medium ${
-                    insights.priceTrend === "Increasing"
-                      ? "text-red-600"
-                      : "text-green-600"
-                  }`}
-                >
-                  {insights.priceTrend}
+                <span className="w-1/3 text-sm text-gray-600">
+                  💰 Price Trend
+                </span>
+                <span className="w-2/3 text-sm font-medium text-right">
+                  {insights.priceTrend ||
+                    "Unable to determine price trend from the given data. Requires external web search."}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">🛒 Demand</span>
-                <span
-                  className={`text-sm font-medium ${
-                    insights.demand === "High" || insights.demand === "Extreme"
-                      ? "text-indigo-600"
-                      : "text-blue-600"
-                  }`}
-                >
-                  {insights.demand}
+                <span className="w-1/3 text-sm text-gray-600">🛒 Demand</span>
+                <span className="w-2/3 text-sm font-medium text-right">
+                  {insights.demand || "N/A"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">🏆 Availability</span>
-                <span className="text-sm font-medium text-purple-600">
+                <span className="w-1/3 text-sm text-gray-600">
+                  🏆 Market Share / Availability
+                </span>
+                <span className="w-2/3 text-sm font-medium text-right text-purple-600">
                   {insights.marketShare || insights.Availability || "N/A"}
                 </span>
               </div>
@@ -367,7 +355,7 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
     transition={{ duration: 0.6, delay: 0.3 }}
     className="mb-12"
   >
-    <h3 className="text-2xl font-bold mb-6 text-gray-800">
+    <h3 className="text-2xl font-bold text-gray-800 mb-4">
       📊 Analysis Report
     </h3>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -378,38 +366,50 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
         return (
           <div
             key={product.model}
-            className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 transform transition-transform duration-300 hover:scale-105 hover:shadow-3xl"
+            className="bg-white rounded-2xl shadow-md border border-gray-300 p-6 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl space-y-4"
           >
-            <h4 className="text-xl font-semibold text-indigo-700 mb-4">
+            <h4 className="text-xl font-semibold text-indigo-700">
               {product.model} Analysis
             </h4>
             <div className="space-y-2">
-              <p className="text-gray-700">
-                <span className="font-medium">Price:</span>{" "}
-                {Array.isArray(details.price)
-                  ? details.price.join(", ")
-                  : details.price || "N/A"}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-medium">User Rating:</span>{" "}
-                {details.userRating || "N/A"}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-medium">Reviews:</span>{" "}
-                {details.numberOfReviews || "N/A"}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-medium">Special Features:</span>{" "}
-                {Array.isArray(details.specialFeatures)
-                  ? details.specialFeatures.join(", ") || "None"
-                  : details.specialFeatures || "None"}
-              </p>
+              <div className="flex justify-between items-center">
+                <span className="w-1/3 text-sm text-gray-600">Price:</span>
+                <span className="w-2/3 text-sm font-medium text-right">
+                  {Array.isArray(details.price)
+                    ? details.price.join(", ")
+                    : details.price || "N/A"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="w-1/3 text-sm text-gray-600">
+                  User Rating:
+                </span>
+                <span className="w-2/3 text-sm font-medium text-right">
+                  {details.userRating || "N/A"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="w-1/3 text-sm text-gray-600">Reviews:</span>
+                <span className="w-2/3 text-sm font-medium text-right">
+                  {details.numberOfReviews || "N/A"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="w-1/3 text-sm text-gray-600">
+                  Special Features:
+                </span>
+                <span className="w-2/3 text-sm font-medium text-right">
+                  {Array.isArray(details.specialFeatures)
+                    ? details.specialFeatures.join(", ") || "None"
+                    : details.specialFeatures || "None"}
+                </span>
+              </div>
             </div>
-            <div className="mt-6">
-              <h5 className="text-lg font-semibold text-gray-800">
+            <div>
+              <h5 className="text-lg font-semibold text-gray-800 mb-2">
                 Review Sentiment
               </h5>
-              <div className="flex space-x-4 mt-2">
+              <div className="flex space-x-4">
                 <div className="flex flex-col items-center">
                   <span className="text-sm font-medium text-green-600">
                     {formatPercentage(reviewSentiment.positive)}
@@ -430,11 +430,11 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
                 </div>
               </div>
             </div>
-            <div className="mt-6">
-              <h5 className="text-lg font-semibold text-gray-800">
+            <div>
+              <h5 className="text-lg font-semibold text-gray-800 mb-2">
                 Feature Importance
               </h5>
-              <div className="flex space-x-4 mt-2">
+              <div className="flex space-x-4">
                 <div className="flex flex-col items-center">
                   <span className="text-sm font-medium text-indigo-600">
                     {featureImportance.price || "N/A"}
@@ -469,8 +469,9 @@ const CustomerReviewsPanel = React.memo(({ activeSelectedProducts }) => (
     initial={{ y: 30, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
     transition={{ duration: 0.6, delay: 0.5 }}
+    className="mb-12"
   >
-    <h3 className="text-2xl font-bold mb-6 text-gray-800">
+    <h3 className="text-2xl font-bold text-gray-800 mb-4">
       😊 Customer Feedback
     </h3>
     <div className="space-y-6">
@@ -485,13 +486,13 @@ const CustomerReviewsPanel = React.memo(({ activeSelectedProducts }) => (
         return (
           <div
             key={product.model}
-            className="bg-white p-6 rounded-2xl border border-gray-200 hover:shadow-xl transition-shadow"
+            className="bg-white p-6 rounded-2xl border border-gray-300 hover:shadow-lg transition-shadow space-y-4"
           >
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-              <h4 className="text-lg font-semibold text-gray-800 mb-2 md:mb-0">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <h4 className="text-lg font-semibold text-gray-800">
                 💬 {product.model} Reviews
               </h4>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 mt-2 md:mt-0">
                 <div className="flex items-center">
                   <StarRating rating={avgRating} />
                   <span className="ml-2 text-sm text-gray-600">
@@ -507,7 +508,7 @@ const CustomerReviewsPanel = React.memo(({ activeSelectedProducts }) => (
               {reviews?.map((review, index) => (
                 <div
                   key={index}
-                  className="bg-gray-50 p-4 rounded-xl border border-gray-200 hover:border-indigo-300 transition-all"
+                  className="bg-gray-50 p-4 rounded-md border border-gray-200 hover:border-indigo-300 transition-all"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
@@ -626,7 +627,7 @@ const CompetitorResults = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white relative">
         <div className="absolute inset-0 bg-white opacity-80"></div>
-        <div className="z-10 flex flex-col items-center">
+        <div className="z-10 flex flex-col items-center space-y-4">
           <Lottie
             animationData={sparklesAnimation}
             loop
@@ -634,7 +635,7 @@ const CompetitorResults = () => {
             className="w-32 h-32"
             rendererSettings={{ preserveAspectRatio: "xMidYMid slice" }}
           />
-          <p className="text-2xl font-bold text-gray-800 mt-4 text-center">
+          <p className="text-2xl font-bold text-gray-800 text-center">
             Analysis ongoing, fetching competitor details...
           </p>
         </div>
@@ -658,7 +659,7 @@ const CompetitorResults = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={mounted ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8 }}
-        className="flex gap-8 relative z-10"
+        className="flex flex-col md:flex-row gap-8 relative z-10"
       >
         <FilterPanel
           myProducts={myProducts}
@@ -670,7 +671,7 @@ const CompetitorResults = () => {
           toggleFeatureSelection={toggleFeatureSelection}
           handleResetFilters={handleResetFilters}
         />
-        <div className="flex-1 p-8 bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200">
+        <div className="flex-1 p-8 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-300">
           <h2 className="text-4xl font-extrabold text-center mb-10 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-pulse">
             📊 {query.charAt(0).toUpperCase() + query.slice(1)} Competitive
             Analysis
