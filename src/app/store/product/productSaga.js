@@ -44,21 +44,24 @@ function* fetchCompetitorBrandsSaga(action) {
 // Fetch Competitor Products
 function* fetchCompetitorProductsSaga(action) {
   try {
-    const { category_name, brand_name, selected_competitor_names } =
-      action.payload;
+    const {
+      category_name: product_name,
+      brand_name,
+      selected_competitor_names: company_names_input,
+    } = action.payload;
     if (useDummyData) {
       yield delay(2000);
       const data = fetchCompetitorProductsDummy();
 
       const filteredProducts = data.products.filter((product) => {
         // Assume all dummy products belong to "electronics"
-        if (category_name.toLowerCase() !== "electronics") return false;
+        if (product_name.toLowerCase() !== "electronics") return false;
         // Include all my products without filtering by brand_name
         if (product.isMyCompanyProduct) {
           return true;
         }
         // For competitor products, check if competitorName is in the provided list
-        return selected_competitor_names.some(
+        return company_names_input.some(
           (name) => name.toLowerCase() === product.competitorName.toLowerCase()
         );
       });
@@ -78,9 +81,9 @@ function* fetchCompetitorProductsSaga(action) {
       axios.post,
       `${process.env.NEXT_PUBLIC_API_URL}/fetch-products`,
       {
-        category_name,
+        product_name,
         brand_name,
-        selected_competitor_names,
+        company_names_input,
       }
     );
     yield put(fetchCompetitorProductsSuccess(response.data.products));

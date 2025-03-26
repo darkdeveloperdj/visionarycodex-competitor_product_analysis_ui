@@ -10,6 +10,13 @@ import { motion } from "framer-motion";
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/SearchPage.css";
 
+// Helper function to format percentage values to max two decimals.
+const formatPercentage = (value) => {
+  if (!value) return "N/A";
+  const numberValue = parseFloat(value.replace("%", ""));
+  return isNaN(numberValue) ? "N/A" : numberValue.toFixed(2) + "%";
+};
+
 // Custom hook for filter state management
 const useFilters = (initialProducts) => {
   const [activeFilters, setActiveFilters] = useState(new Set());
@@ -205,7 +212,10 @@ const FeatureComparisonTable = React.memo(
         <table className="w-full">
           <thead className="bg-gradient-to-r from-indigo-100 to-purple-100">
             <tr>
-              <th className="p-4 text-left font-semibold text-gray-700 rounded-tl-2xl">
+              <th className="p-4 text-left font-semibold text-gray-700">
+                Thumbnail
+              </th>
+              <th className="p-4 text-left font-semibold text-gray-700">
                 🏭 Brand
               </th>
               <th className="p-4 text-left font-semibold text-gray-700">
@@ -214,7 +224,7 @@ const FeatureComparisonTable = React.memo(
               {selectedFeatures.map((feature) => (
                 <th
                   key={feature}
-                  className="p-4 text-center font-semibold text-gray-700 rounded-tr-2xl"
+                  className="p-4 text-center font-semibold text-gray-700"
                 >
                   {feature}
                 </th>
@@ -231,6 +241,17 @@ const FeatureComparisonTable = React.memo(
                     index % 2 === 0 ? "bg-gray-50" : "bg-white"
                   } hover:bg-gray-100 transition-colors`}
                 >
+                  <td className="p-4 text-center">
+                    {features.thumbnail ? (
+                      <img
+                        src={features.thumbnail}
+                        alt={product.model}
+                        className="h-12 w-12 object-cover rounded"
+                      />
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
                   <td className="p-4 text-sm font-medium text-gray-800">
                     <div className="flex items-center gap-2">
                       {product.isMyCompanyProduct ? (
@@ -326,9 +347,9 @@ const MarketInsightsPanel = React.memo(({ activeSelectedProducts }) => (
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">🏆 Market Share</span>
+                <span className="text-sm text-gray-600">🏆 Availability</span>
                 <span className="text-sm font-medium text-purple-600">
-                  {insights.marketShare}
+                  {insights.marketShare || insights.Availability || "N/A"}
                 </span>
               </div>
             </div>
@@ -364,19 +385,24 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
             </h4>
             <div className="space-y-2">
               <p className="text-gray-700">
-                <span className="font-medium">Price:</span> ${details.price}
+                <span className="font-medium">Price:</span>{" "}
+                {Array.isArray(details.price)
+                  ? details.price.join(", ")
+                  : details.price || "N/A"}
               </p>
               <p className="text-gray-700">
                 <span className="font-medium">User Rating:</span>{" "}
-                {details.userRating}
+                {details.userRating || "N/A"}
               </p>
               <p className="text-gray-700">
                 <span className="font-medium">Reviews:</span>{" "}
-                {details.numberOfReviews}
+                {details.numberOfReviews || "N/A"}
               </p>
               <p className="text-gray-700">
                 <span className="font-medium">Special Features:</span>{" "}
-                {details.specialFeatures}
+                {Array.isArray(details.specialFeatures)
+                  ? details.specialFeatures.join(", ") || "None"
+                  : details.specialFeatures || "None"}
               </p>
             </div>
             <div className="mt-6">
@@ -386,19 +412,19 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
               <div className="flex space-x-4 mt-2">
                 <div className="flex flex-col items-center">
                   <span className="text-sm font-medium text-green-600">
-                    {reviewSentiment.positive || "N/A"}
+                    {formatPercentage(reviewSentiment.positive)}
                   </span>
                   <span className="text-xs text-gray-500">Positive</span>
                 </div>
                 <div className="flex flex-col items-center">
                   <span className="text-sm font-medium text-gray-600">
-                    {reviewSentiment.neutral || "N/A"}
+                    {formatPercentage(reviewSentiment.neutral)}
                   </span>
                   <span className="text-xs text-gray-500">Neutral</span>
                 </div>
                 <div className="flex flex-col items-center">
                   <span className="text-sm font-medium text-red-600">
-                    {reviewSentiment.negative || "N/A"}
+                    {formatPercentage(reviewSentiment.negative)}
                   </span>
                   <span className="text-xs text-gray-500">Negative</span>
                 </div>
