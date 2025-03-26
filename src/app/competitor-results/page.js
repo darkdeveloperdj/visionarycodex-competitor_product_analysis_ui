@@ -313,10 +313,11 @@ const MarketInsightsPanel = React.memo(({ activeSelectedProducts }) => (
                 <span className="w-1/3 text-sm text-gray-600">
                   🚀 Popularity
                 </span>
-                <span className="w-2/3 text-sm font-medium text-green-600 text-right">
+                <span className="w-2/3 text-sm font-medium text-right">
                   {insights.popularity || "N/A"}
                 </span>
               </div>
+              <hr className="border-t border-gray-200" />
               <div className="flex justify-between items-center">
                 <span className="w-1/3 text-sm text-gray-600">
                   💰 Price Trend
@@ -326,12 +327,14 @@ const MarketInsightsPanel = React.memo(({ activeSelectedProducts }) => (
                     "Unable to determine price trend from the given data. Requires external web search."}
                 </span>
               </div>
+              <hr className="border-t border-gray-200" />
               <div className="flex justify-between items-center">
                 <span className="w-1/3 text-sm text-gray-600">🛒 Demand</span>
                 <span className="w-2/3 text-sm font-medium text-right">
                   {insights.demand || "N/A"}
                 </span>
               </div>
+              <hr className="border-t border-gray-200" />
               <div className="flex justify-between items-center">
                 <span className="w-1/3 text-sm text-gray-600">
                   🏆 Market Share / Availability
@@ -380,6 +383,7 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
                     : details.price || "N/A"}
                 </span>
               </div>
+              <hr className="border-t border-gray-200" />
               <div className="flex justify-between items-center">
                 <span className="w-1/3 text-sm text-gray-600">
                   User Rating:
@@ -388,12 +392,14 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
                   {details.userRating || "N/A"}
                 </span>
               </div>
+              <hr className="border-t border-gray-200" />
               <div className="flex justify-between items-center">
                 <span className="w-1/3 text-sm text-gray-600">Reviews:</span>
                 <span className="w-2/3 text-sm font-medium text-right">
                   {details.numberOfReviews || "N/A"}
                 </span>
               </div>
+              <hr className="border-t border-gray-200" />
               <div className="flex justify-between items-center">
                 <span className="w-1/3 text-sm text-gray-600">
                   Special Features:
