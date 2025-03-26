@@ -96,7 +96,7 @@ const FilterPanel = React.memo(
       transition={{ duration: 0.6 }}
       className="w-80 p-6 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-300 space-y-6"
     >
-      <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+      <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
         🔍 Filters
       </h2>
       {/* My Products */}
@@ -371,9 +371,15 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
             key={product.model}
             className="bg-white rounded-2xl shadow-md border border-gray-300 p-6 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl space-y-4"
           >
-            <h4 className="text-xl font-semibold text-indigo-700">
-              {product.model} Analysis
-            </h4>
+            <div className="flex justify-between items-center">
+              <h4 className="text-lg font-semibold text-gray-800">
+                {product.model}
+              </h4>
+              <span className="text-sm text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
+                {product.competitorName}
+              </span>
+            </div>
+
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="w-1/3 text-sm text-gray-600">Price:</span>
