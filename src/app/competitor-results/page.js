@@ -246,7 +246,10 @@ const FeatureComparisonTable = React.memo(
                   key={feature}
                   className="p-3 text-center font-semibold text-gray-700"
                 >
-                  {feature}
+                  {feature
+                    .split(/(?=[A-Z])/)
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
                 </th>
               ))}
             </tr>
@@ -288,8 +291,15 @@ const FeatureComparisonTable = React.memo(
                   </td>
                   <td className="p-3 text-sm text-gray-600">{product.model}</td>
                   {selectedFeatures.map((feature) => (
-                    <td key={feature} className="p-3 text-center text-2xl">
-                      {features[feature] ? "✅" : "❌"}
+                    <td key={feature} className="p-3 text-sm text-center">
+                      {(() => {
+                        const value = features[feature];
+                        if (value === undefined || value === null) return "N/A";
+                        if (typeof value === "boolean")
+                          return value ? "✅" : "❌";
+                        if (Array.isArray(value)) return value.join(", ");
+                        return value.toString();
+                      })()}
                     </td>
                   ))}
                 </tr>
