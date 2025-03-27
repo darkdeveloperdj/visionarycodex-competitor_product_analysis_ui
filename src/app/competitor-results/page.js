@@ -357,7 +357,7 @@ const MarketInsightsPanel = React.memo(({ activeSelectedProducts }) => (
               <hr className="border-t border-gray-200" />
               <div className="flex justify-between items-center">
                 <span className="w-1/3 text-sm text-gray-600">
-                  🏆 Market Share / Availability
+                  🏆 Availability
                 </span>
                 <span className="w-2/3 text-sm font-medium text-right text-purple-600">
                   {insights.marketShare || insights.Availability || "N/A"}
@@ -442,20 +442,27 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
                   Review Sentiment
                 </h5>
                 <div className="border border-gray-200 p-1">
-                  {Object.entries(reviewSentiment).map(([key, value]) => (
-                    <div key={key} className="flex justify-between text-xs">
-                      <span
-                        className="font-medium text-gray-600"
-                        style={{ width: "50%" }}
-                      >
-                        {key}
-                      </span>
-                      <span style={{ width: "50%" }}>{value}</span>
-                    </div>
-                  ))}
+                  {Object.entries(details.reviewSentiment).map(
+                    ([key, value]) => (
+                      <div key={key} className="flex justify-between text-xs">
+                        <span
+                          className="font-medium text-gray-600"
+                          style={{ width: "50%" }}
+                        >
+                          {key}
+                        </span>
+                        <span style={{ width: "50%" }}>
+                          {typeof value === "number"
+                            ? value.toFixed(2)
+                            : parseFloat(value).toFixed(2)}
+                        </span>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             )}
+
             {/* Sub-table for Feature Importance */}
             {details.featureImportance && (
               <div className="mt-2">
