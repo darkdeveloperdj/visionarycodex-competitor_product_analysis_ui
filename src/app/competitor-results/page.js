@@ -7,26 +7,49 @@ import {
 } from "../store/product/productsSlice";
 import Lottie from "lottie-react";
 import { motion } from "framer-motion";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable"; // Explicit import of autoTable.
+import { FaFilePdf, FaFileCsv } from "react-icons/fa"; // Import PDF and CSV icons.
 import sparklesAnimation from "../../../public/assets/animations/sparkles.json";
 import "../../../public/assets/css/SearchPage.css";
 
-// Helper function to format percentage values to max two decimals.
+// Helper function to format percentage values.
 const formatPercentage = (value) => {
   if (!value) return "N/A";
   const numberValue = parseFloat(value.replace("%", ""));
   return isNaN(numberValue) ? "N/A" : numberValue.toFixed(2) + "%";
 };
 
-// Custom hook for filter state management
+// Recursive function to flatten an object (used for CSV export).
+const flattenObject = (obj, prefix = "") => {
+  let result = {};
+  for (const key in obj) {
+    if (!obj.hasOwnProperty(key)) continue;
+    const value = obj[key];
+    const newKey = prefix ? `${prefix}.${key}` : key;
+    if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+      Object.assign(result, flattenObject(value, newKey));
+    } else if (Array.isArray(value)) {
+      if (value.length > 0 && typeof value[0] === "object") {
+        result[newKey] = value.map((v) => JSON.stringify(v)).join(" | ");
+      } else {
+        result[newKey] = value.join(" | ");
+      }
+    } else {
+      result[newKey] = value;
+    }
+  }
+  return result;
+};
+
+// Custom hook for filter state management.
 const useFilters = (initialProducts) => {
   const [activeFilters, setActiveFilters] = useState(new Set());
   const [selectedFeatures, setSelectedFeatures] = useState([]);
-
   useEffect(() => {
     const allModels = initialProducts.map((p) => p.model);
     setActiveFilters(new Set(allModels));
   }, [initialProducts]);
-
   const toggleActiveFilter = (product) => {
     setActiveFilters((prev) => {
       const newSet = new Set(prev);
@@ -36,7 +59,6 @@ const useFilters = (initialProducts) => {
       return newSet;
     });
   };
-
   const toggleFeatureSelection = (feature) => {
     setSelectedFeatures((prev) =>
       prev.includes(feature)
@@ -44,12 +66,10 @@ const useFilters = (initialProducts) => {
         : [...prev, feature]
     );
   };
-
   const resetFilters = (allModels) => {
     setSelectedFeatures([]);
     setActiveFilters(new Set(allModels));
   };
-
   return {
     activeFilters,
     selectedFeatures,
@@ -361,7 +381,7 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
     <h3 className="text-2xl font-bold text-gray-800 mb-4">
       📊 Analysis Report
     </h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {activeSelectedProducts.map((product) => {
         const details = product.details || {};
         const reviewSentiment = details.reviewSentiment || {};
@@ -369,7 +389,7 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
         return (
           <div
             key={product.model}
-            className="bg-white rounded-2xl shadow-md border border-gray-300 p-6 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl space-y-4"
+            className="bg-white p-6 rounded-2xl border border-gray-300 hover:shadow-lg transition-shadow space-y-3"
           >
             <div className="flex justify-between items-center">
               <h4 className="text-lg font-semibold text-gray-800">
@@ -379,10 +399,10 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
                 {product.competitorName}
               </span>
             </div>
-
+            {/* Main Details Table */}
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="w-1/3 text-sm text-gray-600">Price:</span>
+                <span className="w-1/3 text-sm text-gray-600">Price</span>
                 <span className="w-2/3 text-sm font-medium text-right">
                   {Array.isArray(details.price)
                     ? details.price.join(", ")
@@ -391,16 +411,14 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
               </div>
               <hr className="border-t border-gray-200" />
               <div className="flex justify-between items-center">
-                <span className="w-1/3 text-sm text-gray-600">
-                  User Rating:
-                </span>
+                <span className="w-1/3 text-sm text-gray-600">User Rating</span>
                 <span className="w-2/3 text-sm font-medium text-right">
                   {details.userRating || "N/A"}
                 </span>
               </div>
               <hr className="border-t border-gray-200" />
               <div className="flex justify-between items-center">
-                <span className="w-1/3 text-sm text-gray-600">Reviews:</span>
+                <span className="w-1/3 text-sm text-gray-600">Reviews</span>
                 <span className="w-2/3 text-sm font-medium text-right">
                   {details.numberOfReviews || "N/A"}
                 </span>
@@ -408,7 +426,7 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
               <hr className="border-t border-gray-200" />
               <div className="flex justify-between items-center">
                 <span className="w-1/3 text-sm text-gray-600">
-                  Special Features:
+                  Special Features
                 </span>
                 <span className="w-2/3 text-sm font-medium text-right">
                   {Array.isArray(details.specialFeatures)
@@ -417,58 +435,48 @@ const AnalysisReportPanel = React.memo(({ activeSelectedProducts }) => (
                 </span>
               </div>
             </div>
-            <div>
-              <h5 className="text-lg font-semibold text-gray-800 mb-2">
-                Review Sentiment
-              </h5>
-              <div className="flex space-x-4">
-                <div className="flex flex-col items-center">
-                  <span className="text-sm font-medium text-green-600">
-                    {formatPercentage(reviewSentiment.positive)}
-                  </span>
-                  <span className="text-xs text-gray-500">Positive</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-sm font-medium text-gray-600">
-                    {formatPercentage(reviewSentiment.neutral)}
-                  </span>
-                  <span className="text-xs text-gray-500">Neutral</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-sm font-medium text-red-600">
-                    {formatPercentage(reviewSentiment.negative)}
-                  </span>
-                  <span className="text-xs text-gray-500">Negative</span>
+            {/* Sub-table for Review Sentiment */}
+            {details.reviewSentiment && (
+              <div className="mt-2">
+                <h5 className="text-lg font-semibold text-gray-800 mb-1">
+                  Review Sentiment
+                </h5>
+                <div className="border border-gray-200 p-1">
+                  {Object.entries(reviewSentiment).map(([key, value]) => (
+                    <div key={key} className="flex justify-between text-xs">
+                      <span
+                        className="font-medium text-gray-600"
+                        style={{ width: "50%" }}
+                      >
+                        {key}
+                      </span>
+                      <span style={{ width: "50%" }}>{value}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-            <div>
-              <h5 className="text-lg font-semibold text-gray-800 mb-2">
-                Feature Importance
-              </h5>
-              <div className="flex space-x-4">
-                <div className="flex flex-col items-center">
-                  <span className="text-sm font-medium text-indigo-600">
-                    {featureImportance.price || "N/A"}
-                  </span>
-                  <span className="text-xs text-gray-500">Price</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-sm font-medium text-indigo-600">
-                    {featureImportance.userRating || "N/A"}
-                  </span>
-                  <span className="text-xs text-gray-500">User Rating</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-sm font-medium text-indigo-600">
-                    {featureImportance.specialFeatures || "N/A"}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    Special Features
-                  </span>
+            )}
+            {/* Sub-table for Feature Importance */}
+            {details.featureImportance && (
+              <div className="mt-2">
+                <h5 className="text-lg font-semibold text-gray-800 mb-1">
+                  Feature Importance
+                </h5>
+                <div className="border border-gray-200 p-1">
+                  {Object.entries(featureImportance).map(([key, value]) => (
+                    <div key={key} className="flex justify-between text-xs">
+                      <span
+                        className="font-medium text-gray-600"
+                        style={{ width: "50%" }}
+                      >
+                        {key}
+                      </span>
+                      <span style={{ width: "50%" }}>{value}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
           </div>
         );
       })}
@@ -588,7 +596,212 @@ const CompetitorResults = () => {
   const query = categoryName || "Products";
   const category = categoryName ? categoryName.toLowerCase() : "electronics";
 
-  // Fetch competitor products when competitor brands are selected
+  // Function to export PDF with multiple tables per product.
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    let y = 20;
+    doc.setFontSize(18);
+    doc.text("Competitor Products Report", 14, y);
+    y += 10;
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const equalColWidth = (pageWidth - 28) / 2; // 14 margin on each side.
+
+    competitorProducts.forEach((product, index) => {
+      doc.setFont(undefined, "bold");
+      doc.text(`Product ${index + 1}: ${product.model}`, 14, y);
+      y += 6;
+
+      // Top-Level Table.
+      const topLevelHeaders = ["Key", "Value"];
+      const topLevelData = [
+        ["ID", `${product.id}`],
+        ["Is My Company Product", `${product.isMyCompanyProduct}`],
+        ["Competitor Name", `${product.competitorName}`],
+        ["Model", `${product.model}`],
+        ["Thumbnail", `${product.features?.thumbnail || "N/A"}`],
+      ];
+      autoTable(doc, {
+        head: [topLevelHeaders],
+        body: topLevelData,
+        startY: y,
+        theme: "grid",
+        styles: { fontSize: 10, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: equalColWidth },
+          1: { cellWidth: equalColWidth },
+        },
+      });
+      y = doc.lastAutoTable.finalY + 4;
+
+      // Details Table.
+      doc.setFont(undefined, "bold");
+      doc.text("Details", 14, y);
+      y += 6;
+      const details = product.details || {};
+      const detailsSimpleData = [];
+      if (details.price)
+        detailsSimpleData.push([
+          "Price",
+          Array.isArray(details.price)
+            ? details.price.join(" | ")
+            : details.price,
+        ]);
+      if (details.userRating)
+        detailsSimpleData.push(["User Rating", details.userRating]);
+      if (details.numberOfReviews)
+        detailsSimpleData.push(["Number of Reviews", details.numberOfReviews]);
+      if (details.specialFeatures)
+        detailsSimpleData.push([
+          "Special Features",
+          Array.isArray(details.specialFeatures)
+            ? details.specialFeatures.join(" | ")
+            : details.specialFeatures,
+        ]);
+      autoTable(doc, {
+        head: [["Key", "Value"]],
+        body: detailsSimpleData,
+        startY: y,
+        theme: "striped",
+        styles: { fontSize: 10, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: equalColWidth },
+          1: { cellWidth: equalColWidth },
+        },
+      });
+      y = doc.lastAutoTable.finalY + 4;
+
+      // Sub-table for reviewSentiment.
+      if (details.reviewSentiment) {
+        doc.setFont(undefined, "bold");
+        doc.text("Review Sentiment", 14, y);
+        y += 6;
+        const reviewSentimentData = Object.entries(details.reviewSentiment).map(
+          ([key, value]) => [key, value]
+        );
+        autoTable(doc, {
+          head: [["Key", "Value"]],
+          body: reviewSentimentData,
+          startY: y,
+          theme: "grid",
+          styles: { fontSize: 10, cellPadding: 2 },
+          columnStyles: {
+            0: { cellWidth: equalColWidth },
+            1: { cellWidth: equalColWidth },
+          },
+        });
+        y = doc.lastAutoTable.finalY + 4;
+      }
+
+      // Sub-table for featureImportance.
+      if (details.featureImportance) {
+        doc.setFont(undefined, "bold");
+        doc.text("Feature Importance", 14, y);
+        y += 6;
+        const featureImportanceData = Object.entries(
+          details.featureImportance
+        ).map(([key, value]) => [key, value]);
+        autoTable(doc, {
+          head: [["Key", "Value"]],
+          body: featureImportanceData,
+          startY: y,
+          theme: "grid",
+          styles: { fontSize: 10, cellPadding: 2 },
+          columnStyles: {
+            0: { cellWidth: equalColWidth },
+            1: { cellWidth: equalColWidth },
+          },
+        });
+        y = doc.lastAutoTable.finalY + 4;
+      }
+
+      // Insights Table.
+      doc.setFont(undefined, "bold");
+      doc.text("Insights", 14, y);
+      y += 6;
+      const insights = product.insights || {};
+      const insightsData = Object.entries(insights).map(([key, value]) => [
+        key,
+        value,
+      ]);
+      autoTable(doc, {
+        head: [["Key", "Value"]],
+        body: insightsData,
+        startY: y,
+        theme: "grid",
+        styles: { fontSize: 10, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: equalColWidth },
+          1: { cellWidth: equalColWidth },
+        },
+      });
+      y = doc.lastAutoTable.finalY + 4;
+
+      // Features Table.
+      doc.setFont(undefined, "bold");
+      doc.text("Features", 14, y);
+      y += 6;
+      const features = product.features || {};
+      const featuresData = Object.entries(features).map(([key, value]) => [
+        key,
+        value,
+      ]);
+      autoTable(doc, {
+        head: [["Key", "Value"]],
+        body: featuresData,
+        startY: y,
+        theme: "grid",
+        styles: { fontSize: 10, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: equalColWidth },
+          1: { cellWidth: equalColWidth },
+        },
+      });
+      y = doc.lastAutoTable.finalY + 8;
+
+      // If nearing the page end, add a new page.
+      if (y > 250 && index < competitorProducts.length - 1) {
+        doc.addPage();
+        y = 20;
+      }
+    });
+
+    doc.save("competitor_products.pdf");
+  };
+
+  // Function to export CSV with all product data flattened.
+  const handleExportCSV = () => {
+    if (!competitorProducts.length) return;
+    const flattenedProducts = competitorProducts.map((product) =>
+      flattenObject(product)
+    );
+    const allHeadersSet = new Set();
+    flattenedProducts.forEach((flat) => {
+      Object.keys(flat).forEach((key) => allHeadersSet.add(key));
+    });
+    const headers = Array.from(allHeadersSet);
+    const csvRows = [];
+    csvRows.push(headers.join(","));
+    flattenedProducts.forEach((row) => {
+      const values = headers.map(
+        (header) => `"${row[header] !== undefined ? row[header] : ""}"`
+      );
+      csvRows.push(values.join(","));
+    });
+    const csvString = csvRows.join("\n");
+    const blob = new Blob([csvString], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.setAttribute("hidden", "");
+    a.setAttribute("href", url);
+    a.setAttribute("download", "competitor_products.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  // Fetch competitor products when competitor brands are selected.
   useEffect(() => {
     if (selectedCompetitorBrands?.length > 0) {
       dispatch(
@@ -657,6 +870,20 @@ const CompetitorResults = () => {
 
   return (
     <div className="min-h-screen bg-white text-gray-800 p-8 flex flex-col font-sans relative overflow-hidden">
+      {/* Top-right Icons for Export */}
+      <div
+        className="absolute top-4 right-4 flex gap-3 z-20"
+        style={{ paddingTop: 36, paddingRight: 30 }}
+      >
+        <FaFilePdf
+          onClick={handleExportPDF}
+          className="cursor-pointer text-blue-600 hover:text-blue-700 text-2xl"
+        />
+        <FaFileCsv
+          onClick={handleExportCSV}
+          className="cursor-pointer text-green-600 hover:text-green-700 text-2xl"
+        />
+      </div>
       <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
         <Lottie
           animationData={sparklesAnimation}
@@ -669,7 +896,7 @@ const CompetitorResults = () => {
       </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={mounted ? { opacity: 1, y: 0 } : {}}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="flex flex-col md:flex-row gap-8 relative z-10"
       >
@@ -684,9 +911,12 @@ const CompetitorResults = () => {
           handleResetFilters={handleResetFilters}
         />
         <div className="flex-1 p-8 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-300">
-          <h2 className="text-4xl font-extrabold text-center mb-10 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-pulse">
-            📊 {query.charAt(0).toUpperCase() + query.slice(1)} Competitive
-            Analysis
+          <h2 className="text-4xl font-extrabold text-center mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-pulse">
+            📊{" "}
+            {categoryName
+              ? categoryName.charAt(0).toUpperCase() + categoryName.slice(1)
+              : "Products"}{" "}
+            Competitive Analysis
           </h2>
           <FeatureComparisonTable
             activeSelectedProducts={activeSelectedProducts}
