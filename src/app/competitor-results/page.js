@@ -945,6 +945,23 @@ const CompetitorResults = () => {
           <AnalysisReportPanel
             activeSelectedProducts={activeSelectedProducts}
           />
+
+          {/* Data Report */}
+          <div className="mb-12 animate-fadeInUp delay-300">
+            {/* <h3 className="text-2xl font-bold mb-6 text-gray-700">
+              📊 Analysis Report
+            </h3> */}
+            <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
+              <iframe
+                className="w-full h-[450px] md:h-[600px]"
+                src="https://lookerstudio.google.com/embed/reporting/100436a2-d3ff-410d-9318-8696fa4a79a1/page/gxYEF"
+                frameBorder="0"
+                allowFullScreen
+                sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+              ></iframe>
+            </div>
+          </div>
+
           <CustomerReviewsPanel
             activeSelectedProducts={activeSelectedProducts}
           />
